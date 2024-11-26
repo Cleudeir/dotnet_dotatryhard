@@ -212,3 +212,4 @@
 /home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/obj/Debug/net8.0/dotatryhard.pdb
 /home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/obj/Debug/net8.0/dotatryhard.genruntimeconfig.cache
 /home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/obj/Debug/net8.0/ref/dotatryhard.dll
+/home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/obj/Debug/net8.0/dotatryhard.sourcelink.json

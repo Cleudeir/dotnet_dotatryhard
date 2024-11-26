@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using dotatryhard.Data;
 using dotatryhard.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Controllers
 {
@@ -20,9 +20,9 @@ namespace dotatryhard.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPlayersMatches()
         {
-            var playersMatches = await _context.PlayersMatches
-                .Include(pm => pm.Player)
-                .Include(pm => pm.Match)
+            var playersMatches = await _context
+                .players_matches.Include(pm => pm.player)
+                .Include(pm => pm.match)
                 .ToListAsync();
             return Ok(playersMatches);
         }
@@ -31,10 +31,10 @@ namespace dotatryhard.Controllers
         [HttpGet("{accountId}/{matchId}")]
         public async Task<IActionResult> GetPlayersMatch(long accountId, long matchId)
         {
-            var playersMatch = await _context.PlayersMatches
-                .Include(pm => pm.Player)
-                .Include(pm => pm.Match)
-                .FirstOrDefaultAsync(pm => pm.AccountId == accountId && pm.MatchId == matchId);
+            var playersMatch = await _context
+                .players_matches.Include(pm => pm.player)
+                .Include(pm => pm.match)
+                .FirstOrDefaultAsync(pm => pm.account_id == accountId && pm.match_id == matchId);
 
             if (playersMatch == null)
             {
@@ -53,23 +53,36 @@ namespace dotatryhard.Controllers
                 return BadRequest();
             }
 
-            _context.PlayersMatches.Add(playersMatch);
+            _context.players_matches.Add(playersMatch);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetPlayersMatch), new { accountId = playersMatch.AccountId, matchId = playersMatch.MatchId }, playersMatch);
+            return CreatedAtAction(
+                nameof(GetPlayersMatch),
+                new { accountId = playersMatch.account_id, matchId = playersMatch.match_id },
+                playersMatch
+            );
         }
 
         // PUT: api/PlayersMatches/{accountId}/{matchId}
         [HttpPut("{accountId}/{matchId}")]
-        public async Task<IActionResult> UpdatePlayersMatch(long accountId, long matchId, [FromBody] PlayersMatches updatedPlayersMatch)
+        public async Task<IActionResult> UpdatePlayersMatch(
+            long accountId,
+            long matchId,
+            [FromBody] PlayersMatches updatedPlayersMatch
+        )
         {
-            if (updatedPlayersMatch == null || accountId != updatedPlayersMatch.AccountId || matchId != updatedPlayersMatch.MatchId)
+            if (
+                updatedPlayersMatch == null
+                || accountId != updatedPlayersMatch.account_id
+                || matchId != updatedPlayersMatch.match_id
+            )
             {
                 return BadRequest();
             }
 
-            var playersMatch = await _context.PlayersMatches
-                .FirstOrDefaultAsync(pm => pm.AccountId == accountId && pm.MatchId == matchId);
+            var playersMatch = await _context.players_matches.FirstOrDefaultAsync(pm =>
+                pm.account_id == accountId && pm.match_id == matchId
+            );
 
             if (playersMatch == null)
             {
@@ -77,13 +90,13 @@ namespace dotatryhard.Controllers
             }
 
             // Update the properties
-            playersMatch.Assists = updatedPlayersMatch.Assists;
-            playersMatch.Deaths = updatedPlayersMatch.Deaths;
-            playersMatch.Kills = updatedPlayersMatch.Kills;
-            playersMatch.GoldPerMin = updatedPlayersMatch.GoldPerMin;
-            playersMatch.XpPerMin = updatedPlayersMatch.XpPerMin;
+            playersMatch.assists = updatedPlayersMatch.assists;
+            playersMatch.deaths = updatedPlayersMatch.deaths;
+            playersMatch.kills = updatedPlayersMatch.kills;
+            playersMatch.gold_per_min = updatedPlayersMatch.gold_per_min;
+            playersMatch.xp_per_min = updatedPlayersMatch.xp_per_min;
 
-            _context.PlayersMatches.Update(playersMatch);
+            _context.players_matches.Update(playersMatch);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -93,15 +106,16 @@ namespace dotatryhard.Controllers
         [HttpDelete("{accountId}/{matchId}")]
         public async Task<IActionResult> DeletePlayersMatch(long accountId, long matchId)
         {
-            var playersMatch = await _context.PlayersMatches
-                .FirstOrDefaultAsync(pm => pm.AccountId == accountId && pm.MatchId == matchId);
+            var playersMatch = await _context.players_matches.FirstOrDefaultAsync(pm =>
+                pm.account_id == accountId && pm.match_id == matchId
+            );
 
             if (playersMatch == null)
             {
                 return NotFound();
             }
 
-            _context.PlayersMatches.Remove(playersMatch);
+            _context.players_matches.Remove(playersMatch);
             await _context.SaveChangesAsync();
 
             return NoContent();

@@ -1,20 +1,14 @@
-using Microsoft.EntityFrameworkCore;
 using dotatryhard.Models;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : DbContext(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
-
         // Define DbSet properties for your models
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Match> Matches { get; set; }
-        public DbSet<Player> Players { get; set; }
-        public DbSet<PlayersMatches> PlayersMatches { get; set; }
+        public required DbSet<Match> matches { get; set; }
+        public required DbSet<Player> players { get; set; }
+        public required DbSet<PlayersMatches> players_matches { get; set; }
     }
 }

@@ -47,50 +47,29 @@ namespace dotatryhard.Services
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 var responseData = await response.Content.ReadAsStringAsync();
-
-                // debug response
-                Console.WriteLine(responseData);
-
-                // Deserialize response JSON
                 var data = JsonSerializer.Deserialize<DotaMatchHistoryResponse>(responseData);
-                // debug response
-                Console.WriteLine(data);
 
-                if (data?.Result?.Matches == null)
+                if (data?.result?.matches == null)
                 {
                     return null;
                 }
-
-                // Retrieve existing match IDs from database
-                var matchIds = data.Result.Matches.Select(m => m.MatchId).ToList();
-                var existingMatchIds = await _dbContext
-                    .PlayersMatches.Where(pm => matchIds.Contains(pm.MatchId))
-                    .Select(pm => pm.MatchId)
-                    .ToListAsync();
 
                 // Filter out matches that already exist in the database
-                var newMatches = data
-                    .Result.Matches.Where(m => !existingMatchIds.Contains(m.MatchId))
-                    .ToList();
-
-                if (!newMatches.Any())
-                {
-                    return null;
-                }
-
+                var newMatches = data.result.matches;
                 // Collect unique match IDs and player IDs
                 var matchesSet = new HashSet<long>();
                 var playersSet = new HashSet<int>();
 
                 foreach (var match in newMatches)
                 {
-                    matchesSet.Add(match.MatchId);
-                    foreach (var player in match.Players)
+                    matchesSet.Add(match.match_id);
+                    foreach (var player in match.players)
                     {
-                        int playerAccountId =
-                            player.AccountId == 4294967295
-                                ? player.PlayerSlot + 1
-                                : player.AccountId;
+                        int playerAccountId = (int)(
+                            player.account_id == 4294967295
+                                ? player.player_slot + 1
+                                : player.account_id
+                        );
                         playersSet.Add(playerAccountId);
                     }
                 }
@@ -112,27 +91,4 @@ namespace dotatryhard.Services
             }
         }
     }
-}
-
-// Models for API response deserialization
-public class DotaMatchHistoryResponse
-{
-    public Result Result { get; set; }
-}
-
-public class Result
-{
-    public List<Match> Matches { get; set; }
-}
-
-public class Match
-{
-    public long MatchId { get; set; }
-    public List<Player> Players { get; set; }
-}
-
-public class Player
-{
-    public int AccountId { get; set; }
-    public int PlayerSlot { get; set; }
 }

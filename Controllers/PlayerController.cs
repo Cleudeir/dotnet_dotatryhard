@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using dotatryhard.Data;
 using dotatryhard.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Controllers
@@ -19,15 +19,16 @@ namespace dotatryhard.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPlayers()
         {
-            return Ok(await _context.Players.ToListAsync());
+            return Ok(await _context.players.ToListAsync());
         }
 
         [HttpPost]
         public async Task<IActionResult> CreatePlayer([FromBody] Player player)
         {
-            if (player == null) return BadRequest();
+            if (player == null)
+                return BadRequest();
 
-            await _context.Players.AddAsync(player);
+            await _context.players.AddAsync(player);
             await _context.SaveChangesAsync();
             return Ok(player);
         }

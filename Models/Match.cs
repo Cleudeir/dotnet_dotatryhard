@@ -4,13 +4,14 @@ namespace dotatryhard.Models
 {
     public class Match
     {
-        public long MatchId { get; set; }
-        public long? StartTime { get; set; }
-        public string? Cluster { get; set; }
-        public short? DireScore { get; set; }
-        public short? RadiantScore { get; set; }
-        public short? Duration { get; set; }
+        public long match_id { get; set; }
+        public long? start_time { get; set; }
+        public string? cluster { get; set; }
+        public short? dire_score { get; set; }
+        public short? radiant_score { get; set; }
+        public short? duration { get; set; }
 
-        public ICollection<PlayersMatches> PlayersMatches { get; set; } = new List<PlayersMatches>();
+        public ICollection<PlayersMatches> PlayersMatches { get; set; } =
+            new List<PlayersMatches>();
     }
 }

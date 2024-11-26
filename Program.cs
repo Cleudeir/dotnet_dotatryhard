@@ -3,7 +3,6 @@ using dotatryhard.Interfaces;
 using dotatryhard.Services;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

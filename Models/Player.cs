@@ -4,7 +4,7 @@ namespace dotatryhard.Models
 {
     public class Player
     {
-        public long AccountId { get; set; }
+        public long account_id { get; set; }
         public string? PersonaName { get; set; }
         public string? AvatarFull { get; set; }
         public string? LocCountryCode { get; set; }
