@@ -19,7 +19,7 @@ namespace dotatryhard.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPlayers()
         {
-            return Ok(await _context.players.ToListAsync());
+            return Ok(await _context.Players.ToListAsync());
         }
 
         [HttpPost]
@@ -28,7 +28,7 @@ namespace dotatryhard.Controllers
             if (player == null)
                 return BadRequest();
 
-            await _context.players.AddAsync(player);
+            await _context.Players.AddAsync(player);
             await _context.SaveChangesAsync();
             return Ok(player);
         }
