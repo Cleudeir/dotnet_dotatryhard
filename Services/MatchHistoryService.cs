@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 using dotatryhard.Data;
 using dotatryhard.Interfaces;
-using DotNetEnv;
-using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Services
 {
@@ -28,7 +21,7 @@ namespace dotatryhard.Services
             _configuration = configuration;
         }
 
-        public async Task<(List<int> Matches, List<int> Players)?> GetMatchHistoryAsync(
+        public async Task<(List<long> Matches, List<int> Players)?> GetMatchHistoryAsync(
             int accountId
         )
         {
@@ -75,8 +68,11 @@ namespace dotatryhard.Services
                 }
 
                 // Convert sets to lists
-                var matches = matchesSet.Select(x => (int)x).ToList();
+                var matches = matchesSet.ToList();
                 var players = playersSet.ToList();
+
+                Console.WriteLine($"Found {matches.Count} new matches.");
+                Console.WriteLine($"Found {players.Count} new players.");
 
                 Console.WriteLine(
                     $"Match history processed in {(DateTime.Now - startTime).TotalSeconds} seconds."

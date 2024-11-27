@@ -2,6 +2,6 @@ namespace dotatryhard.Interfaces
 {
     public interface IMatchHistoryService
     {
-        Task<(List<int> Matches, List<int> Players)?> GetMatchHistoryAsync(int accountId);
+        Task<(List<long> Matches, List<int> Players)?> GetMatchHistoryAsync(int accountId);
     }
 }

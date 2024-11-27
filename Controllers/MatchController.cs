@@ -23,10 +23,17 @@ namespace dotatryhard.Controllers
             var result = await _matchHistoryService.GetMatchHistoryAsync(accountId);
             if (result == null)
             {
-                return NotFound("No new match history found.");
+                return NotFound(new { message = "No new match history found." });
             }
 
-            return Ok(result);
+            // Structure the JSON response
+            var response = new
+            {
+                Matches = result.Value.Matches, // List of match IDs
+                Players = result.Value.Players, // List of player IDs
+            };
+
+            return Ok(response);
         }
     }
 }
