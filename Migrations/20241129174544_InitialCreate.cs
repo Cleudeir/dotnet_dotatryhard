@@ -39,11 +39,11 @@ namespace dotatryhard.Migrations
                 {
                     account_id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    PersonaName = table.Column<string>(type: "longtext", nullable: true)
+                    personaname = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AvatarFull = table.Column<string>(type: "longtext", nullable: true)
+                    avatarfull = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LocCountryCode = table.Column<string>(type: "longtext", nullable: true)
+                    loccountrycode = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -58,26 +58,65 @@ namespace dotatryhard.Migrations
                 {
                     account_id = table.Column<long>(type: "bigint", nullable: false),
                     match_id = table.Column<long>(type: "bigint", nullable: false),
+                    last_hits = table.Column<short>(type: "smallint", nullable: true),
+                    denies = table.Column<short>(type: "smallint", nullable: true),
                     assists = table.Column<short>(type: "smallint", nullable: true),
                     deaths = table.Column<short>(type: "smallint", nullable: true),
                     kills = table.Column<short>(type: "smallint", nullable: true),
+                    hero_damage = table.Column<int>(type: "int", nullable: true),
+                    hero_healing = table.Column<int>(type: "int", nullable: true),
+                    net_worth = table.Column<int>(type: "int", nullable: true),
+                    tower_damage = table.Column<int>(type: "int", nullable: true),
                     gold_per_min = table.Column<short>(type: "smallint", nullable: true),
                     xp_per_min = table.Column<short>(type: "smallint", nullable: true),
-                    playeraccount_id = table.Column<long>(type: "bigint", nullable: false),
-                    match_id1 = table.Column<long>(type: "bigint", nullable: false)
+                    ability_0 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ability_1 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ability_2 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ability_3 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    hero_level = table.Column<short>(type: "smallint", nullable: true),
+                    team = table.Column<byte>(type: "tinyint unsigned", nullable: true),
+                    leaver_status = table.Column<byte>(type: "tinyint unsigned", nullable: true),
+                    aghanims_scepter = table.Column<short>(type: "smallint", nullable: true),
+                    aghanims_shard = table.Column<short>(type: "smallint", nullable: true),
+                    backpack_0 = table.Column<short>(type: "smallint", nullable: true),
+                    backpack_1 = table.Column<short>(type: "smallint", nullable: true),
+                    backpack_2 = table.Column<short>(type: "smallint", nullable: true),
+                    item_0 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_1 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_2 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_3 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_4 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_5 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_neutral = table.Column<short>(type: "smallint", nullable: true),
+                    moonshard = table.Column<short>(type: "smallint", nullable: true),
+                    hero_id = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    player_slot = table.Column<short>(type: "smallint", nullable: true),
+                    win = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    score = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PlayersMatches", x => new { x.account_id, x.match_id });
                     table.ForeignKey(
-                        name: "FK_PlayersMatches_Matches_match_id1",
-                        column: x => x.match_id1,
+                        name: "FK_PlayersMatches_Matches_match_id",
+                        column: x => x.match_id,
                         principalTable: "Matches",
                         principalColumn: "match_id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PlayersMatches_Players_playeraccount_id",
-                        column: x => x.playeraccount_id,
+                        name: "FK_PlayersMatches_Players_account_id",
+                        column: x => x.account_id,
                         principalTable: "Players",
                         principalColumn: "account_id",
                         onDelete: ReferentialAction.Cascade);
@@ -85,14 +124,9 @@ namespace dotatryhard.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlayersMatches_match_id1",
+                name: "IX_PlayersMatches_match_id",
                 table: "PlayersMatches",
-                column: "match_id1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlayersMatches_playeraccount_id",
-                table: "PlayersMatches",
-                column: "playeraccount_id");
+                column: "match_id");
         }
 
         /// <inheritdoc />

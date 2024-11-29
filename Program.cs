@@ -15,17 +15,16 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 
 // Configure MySQL
-var connectionString =
-    $"Server={Environment.GetEnvironmentVariable("MYSQL_HOST")};"
-    + $"Port={Environment.GetEnvironmentVariable("MYSQL_PORT")};"
-    + $"Database={Environment.GetEnvironmentVariable("MYSQL_DATABASE")};"
-    + $"User={Environment.GetEnvironmentVariable("MYSQL_USER")};"
-    + $"Password={Environment.GetEnvironmentVariable("MYSQL_PASSWORD")};";
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 32)))
-);
-builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+            .Replace("${MYSQL_HOST}", Environment.GetEnvironmentVariable("MYSQL_HOST"))
+            .Replace("${MYSQL_PORT}", Environment.GetEnvironmentVariable("MYSQL_PORT"))
+            .Replace("${MYSQL_DATABASE}", Environment.GetEnvironmentVariable("MYSQL_DATABASE"))
+            .Replace("${MYSQL_USER}", Environment.GetEnvironmentVariable("MYSQL_USER"))
+            .Replace("${MYSQL_PASSWORD}", Environment.GetEnvironmentVariable("MYSQL_PASSWORD")),
+        new MySqlServerVersion(new Version(8, 0, 27)) // Adjust version as needed
+    ));
 
 var app = builder.Build();
 

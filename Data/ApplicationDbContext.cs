@@ -1,33 +1,42 @@
-using dotatryhard.Models;
-using Microsoft.EntityFrameworkCore;
+using dotatryhard.Models; // Import the namespace containing the entity models (Match, Player, PlayersMatches)
+using Microsoft.EntityFrameworkCore; // Import Entity Framework Core for database interactions
 
 namespace dotatryhard.Data
 {
-    public class ApplicationDbContext : DbContext
-    {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
 
-        public DbSet<Match> Matches { get; set; }
-        public DbSet<Player> Players { get; set; }
-        public DbSet<PlayersMatches> PlayersMatches { get; set; }
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+    {
+        public required DbSet<Match> Matches { get; set; }
+        public required DbSet<Player> Players { get; set; }
+        public required DbSet<PlayersMatches> PlayersMatches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Match>(entity =>
-            {
-                entity.HasKey(m => m.match_id); // Explicitly set the primary key
-            });
+            
+            base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Player>(entity =>
-            {
-                entity.HasKey(p => p.account_id); // Ensure primary key for Player
-            });
+            // Configure primary key for Match
+            modelBuilder.Entity<Match>()
+                .HasKey(m => m.match_id);
 
-            modelBuilder.Entity<PlayersMatches>(entity =>
-            {
-                entity.HasKey(pm => new { pm.account_id, pm.match_id }); // Composite key
-            });
+            // Configure primary key for Player
+            modelBuilder.Entity<Player>()
+                .HasKey(p => p.account_id);
+
+            // Configure composite primary key for PlayersMatches
+            modelBuilder.Entity<PlayersMatches>()
+                .HasKey(pm => new { pm.account_id, pm.match_id });
+
+            // Configure relationships
+            modelBuilder.Entity<PlayersMatches>()
+                .HasOne(pm => pm.player)
+                .WithMany(p => p.PlayersMatches)
+                .HasForeignKey(pm => pm.account_id);
+
+            modelBuilder.Entity<PlayersMatches>()
+                .HasOne(pm => pm.match)
+                .WithMany(m => m.PlayersMatches)
+                .HasForeignKey(pm => pm.match_id);
         }
     }
 }

@@ -12,7 +12,7 @@ using dotatryhard.Data;
 namespace dotatryhard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241127115025_InitialCreate")]
+    [Migration("20241129174544_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -61,13 +61,13 @@ namespace dotatryhard.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("account_id"));
 
-                    b.Property<string>("AvatarFull")
+                    b.Property<string>("avatarfull")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("LocCountryCode")
+                    b.Property<string>("loccountrycode")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PersonaName")
+                    b.Property<string>("personaname")
                         .HasColumnType("longtext");
 
                     b.HasKey("account_id");
@@ -83,47 +83,129 @@ namespace dotatryhard.Migrations
                     b.Property<long>("match_id")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("ability_0")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ability_1")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ability_2")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ability_3")
+                        .HasColumnType("longtext");
+
+                    b.Property<short?>("aghanims_scepter")
+                        .HasColumnType("smallint");
+
+                    b.Property<short?>("aghanims_shard")
+                        .HasColumnType("smallint");
+
                     b.Property<short?>("assists")
+                        .HasColumnType("smallint");
+
+                    b.Property<short?>("backpack_0")
+                        .HasColumnType("smallint");
+
+                    b.Property<short?>("backpack_1")
+                        .HasColumnType("smallint");
+
+                    b.Property<short?>("backpack_2")
                         .HasColumnType("smallint");
 
                     b.Property<short?>("deaths")
                         .HasColumnType("smallint");
 
+                    b.Property<short?>("denies")
+                        .HasColumnType("smallint");
+
                     b.Property<short?>("gold_per_min")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("hero_damage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("hero_healing")
+                        .HasColumnType("int");
+
+                    b.Property<string>("hero_id")
+                        .HasColumnType("longtext");
+
+                    b.Property<short?>("hero_level")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("item_0")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("item_1")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("item_2")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("item_3")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("item_4")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("item_5")
+                        .HasColumnType("longtext");
+
+                    b.Property<short?>("item_neutral")
                         .HasColumnType("smallint");
 
                     b.Property<short?>("kills")
                         .HasColumnType("smallint");
 
-                    b.Property<long>("match_id1")
-                        .HasColumnType("bigint");
+                    b.Property<short?>("last_hits")
+                        .HasColumnType("smallint");
 
-                    b.Property<long>("playeraccount_id")
-                        .HasColumnType("bigint");
+                    b.Property<byte?>("leaver_status")
+                        .HasColumnType("tinyint unsigned");
+
+                    b.Property<short?>("moonshard")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("net_worth")
+                        .HasColumnType("int");
+
+                    b.Property<short?>("player_slot")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("score")
+                        .HasColumnType("int");
+
+                    b.Property<byte?>("team")
+                        .HasColumnType("tinyint unsigned");
+
+                    b.Property<int?>("tower_damage")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("win")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<short?>("xp_per_min")
                         .HasColumnType("smallint");
 
                     b.HasKey("account_id", "match_id");
 
-                    b.HasIndex("match_id1");
-
-                    b.HasIndex("playeraccount_id");
+                    b.HasIndex("match_id");
 
                     b.ToTable("PlayersMatches");
                 });
 
             modelBuilder.Entity("dotatryhard.Models.PlayersMatches", b =>
                 {
-                    b.HasOne("dotatryhard.Models.Match", "match")
+                    b.HasOne("dotatryhard.Models.Player", "player")
                         .WithMany("PlayersMatches")
-                        .HasForeignKey("match_id1")
+                        .HasForeignKey("account_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("dotatryhard.Models.Player", "player")
+                    b.HasOne("dotatryhard.Models.Match", "match")
                         .WithMany("PlayersMatches")
-                        .HasForeignKey("playeraccount_id")
+                        .HasForeignKey("match_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
