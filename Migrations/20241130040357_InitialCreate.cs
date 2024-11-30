@@ -20,6 +20,7 @@ namespace dotatryhard.Migrations
                 {
                     match_id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    match_seq_num = table.Column<long>(type: "bigint", nullable: true),
                     start_time = table.Column<long>(type: "bigint", nullable: true),
                     cluster = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),

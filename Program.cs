@@ -23,7 +23,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             .Replace("${MYSQL_DATABASE}", Environment.GetEnvironmentVariable("MYSQL_DATABASE"))
             .Replace("${MYSQL_USER}", Environment.GetEnvironmentVariable("MYSQL_USER"))
             .Replace("${MYSQL_PASSWORD}", Environment.GetEnvironmentVariable("MYSQL_PASSWORD")),
-        new MySqlServerVersion(new Version(8, 0, 27)) // Adjust version as needed
+        new MySqlServerVersion(new Version(8, 0, 27))
     ));
 
 var app = builder.Build();

@@ -39,6 +39,9 @@ namespace dotatryhard.Migrations
                     b.Property<short?>("duration")
                         .HasColumnType("smallint");
 
+                    b.Property<long?>("match_seq_num")
+                        .HasColumnType("bigint");
+
                     b.Property<short?>("radiant_score")
                         .HasColumnType("smallint");
 

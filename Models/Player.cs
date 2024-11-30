@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace dotatryhard.Models
 {
     public class Player

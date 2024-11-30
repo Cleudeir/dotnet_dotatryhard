@@ -2,19 +2,19 @@ namespace dotatryhard.Interfaces
 {
     public class DotaMatchHistoryResponse
     {
-        public required Result result { get; set; }
+        public required ResultMatchHistory result { get; set; }
     }
 
-    public class Result
+    public class ResultMatchHistory
     {
         public int status { get; set; }
         public int num_results { get; set; }
         public int total_results { get; set; }
         public int results_remaining { get; set; }
-        public required List<Match> matches { get; set; }
+        public required List<MatchMatchHistory> matches { get; set; }
     }
 
-    public class Match
+    public class MatchMatchHistory
     {
         public long match_id { get; set; }
         public long match_seq_num { get; set; }
@@ -22,10 +22,10 @@ namespace dotatryhard.Interfaces
         public int lobby_type { get; set; }
         public int radiant_team_id { get; set; }
         public int dire_team_id { get; set; }
-        public required List<Player> players { get; set; }
+        public required List<PlayerMatchHistory> players { get; set; }
     }
 
-    public class Player
+    public class PlayerMatchHistory
     {
         public long account_id { get; set; }
         public int player_slot { get; set; }

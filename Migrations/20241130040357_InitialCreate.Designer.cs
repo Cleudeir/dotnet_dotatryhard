@@ -12,7 +12,7 @@ using dotatryhard.Data;
 namespace dotatryhard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241129174544_InitialCreate")]
+    [Migration("20241130040357_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,6 +41,9 @@ namespace dotatryhard.Migrations
 
                     b.Property<short?>("duration")
                         .HasColumnType("smallint");
+
+                    b.Property<long?>("match_seq_num")
+                        .HasColumnType("bigint");
 
                     b.Property<short?>("radiant_score")
                         .HasColumnType("smallint");
