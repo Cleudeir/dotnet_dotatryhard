@@ -31,6 +31,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Register application services
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 
+// FIX: Register MatchDetailService
+builder.Services.AddScoped<MatchDetailService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline

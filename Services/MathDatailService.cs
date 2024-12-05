@@ -5,7 +5,7 @@ using dotatryhard.Models;
 public class MatchDetailService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    public MatchDetailService( IHttpClientFactory httpClientFactory)
+    public MatchDetailService(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
     }
@@ -13,10 +13,9 @@ public class MatchDetailService
     public async Task<MatchDetailResponse?> GetMatchDetailsAsync(long match_seq_number)
     {
         var startTime = DateTime.Now;
-        var playersUnique = new HashSet<long>();
-        var matches = new List<Match>();
+        var players = new HashSet<long>();
+        Match newMatch = new();
         var playersMatches = new List<PlayersMatches>();
-        long matchesGameModeError = 0;
 
         try
         {
@@ -29,17 +28,15 @@ public class MatchDetailService
             var matchesData = JsonSerializer.Deserialize<DotaGetMatchHistoryBySequenceNumResponse>(content);
             if (matchesData == null)
             {
-                matchesGameModeError = match_seq_number;
                 return null;
             }
             var match = matchesData.result.matches[0];
             if (matchesData?.result == null && match?.game_mode != 18 && match == null)
             {
-                matchesGameModeError = match_seq_number;
                 return null;
             }
             // Process match
-            matches.Add(new Match
+            newMatch = new Match
             {
                 match_id = match.match_id,
                 start_time = match.start_time,
@@ -49,7 +46,7 @@ public class MatchDetailService
                 radiant_score = match.radiant_score,
                 duration = match.duration,
                 radiant_win = match.radiant_win
-            });
+            };
             // Process players
             foreach (var player in match.players)
             {
@@ -62,9 +59,54 @@ public class MatchDetailService
                     }
                 }
                 var abilities = uniqueAbility.ToArray();
-                var isWin = player.player_slot < 5 == match.radiant_win ? 1 : 0;
-                var score = player.assists * 1 - player.deaths * 1 + player.denies * 1 + player.denies * 1 + player.gold_per_min * 1;
+                var win = player.player_slot < 5 == match.radiant_win ? 1 : 0;
                 var account_id = player.account_id == 4294967295 ? player.player_slot + 1 : player.account_id;
+                var weight = new
+                {
+                    assists = 5,
+                    last_hits = 1,
+                    denies = -1,
+                    kills = 1,
+                    deaths = 1,
+                    gold_per_min = 1,
+                    hero_damage = 1,
+                    hero_healing = 0.1,
+                    net_worth = 1,
+                    tower_damage = 1,
+                    xp_per_min = 1,
+                    winRate = 5,
+                };
+
+                var totalWeight = weight.assists +
+                  weight.last_hits +
+                  weight.denies +
+                  weight.kills +
+                  weight.deaths +
+                  weight.gold_per_min +
+                  weight.hero_damage +
+                  weight.hero_healing +
+                  weight.net_worth +
+                  weight.tower_damage +
+                  weight.xp_per_min +
+                  weight.winRate;
+
+
+
+                var score =
+                  (player.assists * weight.assists +
+                  player.last_hits * weight.last_hits +
+                  player.denies * weight.denies +
+                  player.kills * weight.kills +
+                  player.deaths * weight.deaths +
+                  player.gold_per_min * weight.gold_per_min +
+                  player.hero_damage * weight.hero_damage +
+                  player.hero_healing * weight.hero_healing +
+                  player.net_worth * weight.net_worth +
+                  player.tower_damage * weight.tower_damage +
+                  player.xp_per_min * weight.xp_per_min +
+                  win * weight.winRate) / totalWeight;
+
+
                 playersMatches.Add(new PlayersMatches
                 {
                     account_id = account_id,
@@ -80,7 +122,7 @@ public class MatchDetailService
                     net_worth = player.net_worth,
                     tower_damage = player.tower_damage,
                     xp_per_min = player.xp_per_min,
-                    win = (byte)isWin,
+                    win = (byte)win,
                     ability_0 = abilities.ElementAtOrDefault(0),
                     ability_1 = abilities.ElementAtOrDefault(1),
                     ability_2 = abilities.ElementAtOrDefault(2),
@@ -103,9 +145,9 @@ public class MatchDetailService
                     item_4 = player.item_4,
                     item_5 = player.item_5,
                     player_slot = player.player_slot,
-                    score = score,
+                    score = (int?)score,
                 });
-                playersUnique.Add(account_id);
+                players.Add(account_id);
             }
         }
         catch (Exception ex)
@@ -114,15 +156,14 @@ public class MatchDetailService
         }
 
         Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
-        return new MatchDetailResponse { Matches = matches, PlayersMatches = playersMatches, PlayersUnique = playersUnique, MatchesGameModeError = matchesGameModeError };
+        return new MatchDetailResponse { Match = newMatch, PlayersMatches = playersMatches, Players = players };
     }
 }
 
 public class MatchDetailResponse
 {
-    public required List<Match> Matches { get; set; }
+    public required Match Match { get; set; }
     public required List<PlayersMatches> PlayersMatches { get; set; }
-    public required HashSet<long>? PlayersUnique { get; set; }
-    public required long? MatchesGameModeError { get; set; }
+    public required HashSet<long>? Players { get; set; }
 }
 

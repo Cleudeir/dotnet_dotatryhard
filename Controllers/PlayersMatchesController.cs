@@ -13,7 +13,7 @@ namespace dotatryhard.Controllers
             _matchDetailService = matchDetailService;
         }
         
-        // GET: api/PlayersMatches/{match_seq_number}
+        // GET: http://localhost:5034/api/PlayersMatches/6783727637
         [HttpGet("{match_seq_number}")]
         public async Task<IActionResult> GetPlayersMatch(long match_seq_number)
         {
