@@ -22,11 +22,11 @@ namespace dotatryhard.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     match_seq_num = table.Column<long>(type: "bigint", nullable: true),
                     start_time = table.Column<long>(type: "bigint", nullable: true),
-                    cluster = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    cluster = table.Column<int>(type: "int", nullable: true),
                     dire_score = table.Column<short>(type: "smallint", nullable: true),
                     radiant_score = table.Column<short>(type: "smallint", nullable: true),
-                    duration = table.Column<short>(type: "smallint", nullable: true)
+                    duration = table.Column<short>(type: "smallint", nullable: true),
+                    radiant_win = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,40 +70,29 @@ namespace dotatryhard.Migrations
                     tower_damage = table.Column<int>(type: "int", nullable: true),
                     gold_per_min = table.Column<short>(type: "smallint", nullable: true),
                     xp_per_min = table.Column<short>(type: "smallint", nullable: true),
-                    ability_0 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ability_1 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ability_2 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ability_3 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ability_0 = table.Column<int>(type: "int", nullable: true),
+                    ability_1 = table.Column<int>(type: "int", nullable: true),
+                    ability_2 = table.Column<int>(type: "int", nullable: true),
+                    ability_3 = table.Column<int>(type: "int", nullable: true),
                     hero_level = table.Column<short>(type: "smallint", nullable: true),
                     team = table.Column<byte>(type: "tinyint unsigned", nullable: true),
                     leaver_status = table.Column<byte>(type: "tinyint unsigned", nullable: true),
-                    aghanims_scepter = table.Column<short>(type: "smallint", nullable: true),
+                    aghanims_scepter = table.Column<byte>(type: "tinyint unsigned", nullable: true),
                     aghanims_shard = table.Column<short>(type: "smallint", nullable: true),
                     backpack_0 = table.Column<short>(type: "smallint", nullable: true),
                     backpack_1 = table.Column<short>(type: "smallint", nullable: true),
                     backpack_2 = table.Column<short>(type: "smallint", nullable: true),
-                    item_0 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    item_1 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    item_2 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    item_3 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    item_4 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    item_5 = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    item_0 = table.Column<short>(type: "smallint", nullable: true),
+                    item_1 = table.Column<short>(type: "smallint", nullable: true),
+                    item_2 = table.Column<short>(type: "smallint", nullable: true),
+                    item_3 = table.Column<short>(type: "smallint", nullable: true),
+                    item_4 = table.Column<short>(type: "smallint", nullable: true),
+                    item_5 = table.Column<short>(type: "smallint", nullable: true),
                     item_neutral = table.Column<short>(type: "smallint", nullable: true),
-                    moonshard = table.Column<short>(type: "smallint", nullable: true),
-                    hero_id = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    moonshard = table.Column<byte>(type: "tinyint unsigned", nullable: true),
+                    hero_id = table.Column<short>(type: "smallint", nullable: true),
                     player_slot = table.Column<short>(type: "smallint", nullable: true),
-                    win = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    win = table.Column<byte>(type: "tinyint unsigned", nullable: false),
                     score = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

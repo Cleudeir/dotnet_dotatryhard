@@ -1,175 +1,128 @@
 using System.Text.Json;
-using dotatryhard.Data;
+using dotatryhard.Interfaces;
 using dotatryhard.Models;
-using Microsoft.EntityFrameworkCore;
 
 public class MatchDetailService
 {
-    private readonly ApplicationDbContext _context;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly string _userHomeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-    public MatchDetailService(ApplicationDbContext context, IHttpClientFactory httpClientFactory)
+    public MatchDetailService( IHttpClientFactory httpClientFactory)
     {
-        _context = context;
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<MatchDetailResponse?> GetMatchDetailsAsync(List<long> match_seq_numbers)
+    public async Task<MatchDetailResponse?> GetMatchDetailsAsync(long match_seq_number)
     {
         var startTime = DateTime.Now;
+        var playersUnique = new HashSet<long>();
         var matches = new List<Match>();
         var playersMatches = new List<PlayersMatches>();
-        var playerUnique = new HashSet<string>();
+        long matchesGameModeError = 0;
 
-        // Check existing matches in the database
-        var existingMatchIds = await _context.PlayersMatches
-            .Where(pm => match_seq_numbers.Contains(pm.match_id))
-            .Select(pm => pm.match_id)
-            .ToListAsync();
-
-        var filtered_match_seq_numbers = match_seq_numbers.Except(existingMatchIds).ToList();
-        if (filtered_match_seq_numbers.Count == 0) return null;
-
-        // Load previously errored matches
-        var matchesGameModeErrorPath = Path.Combine(_userHomeDir, "temp", "matchesGameModeError.json");
-        var matchesGameModeError = LoadMatchesGameModeError(matchesGameModeErrorPath);
-
-        foreach (var match_seq_number in filtered_match_seq_numbers)
+        try
         {
-            if (matchesGameModeError.Contains(match_seq_number)) continue;
+            Console.WriteLine($"Processing matchDetails {match_seq_number}");
 
-            try
+            using var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.GetAsync($"{Environment.GetEnvironmentVariable("BASE_URL")}/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1?matches_requested=1&start_at_match_seq_num={match_seq_number}&key={Environment.GetEnvironmentVariable("KEY_API")}");
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var matchesData = JsonSerializer.Deserialize<DotaGetMatchHistoryBySequenceNumResponse>(content);
+            if (matchesData == null)
             {
-                Console.WriteLine($"Processing matchDetails {match_seq_number}");
-                var matchData = await FetchMatchDetailsAsync(match_seq_number);
-                if (matchData?.Result == null || matchData.Result.GameMode != 18)
-                {
-                    matchesGameModeError.Add(match_seq_number);
-                    continue;
-                }
-
-                // Process match
-                matches.Add(new Match
-                {
-                    MatchId = matchData.Result.MatchId,
-                    StartTime = matchData.Result.StartTime,
-                    Cluster = Regions.GetRegion(matchData.Result.Cluster),
-                    DireScore = matchData.Result.DireScore,
-                    RadiantScore = matchData.Result.RadiantScore,
-                    Duration = matchData.Result.Duration
-                });
-
-                // Process players
-                foreach (var player in matchData.Result.Players)
-                {
-                    var uniqueAbility = new HashSet<int>();
-                    if (player.AbilityUpgrades != null)
-                    {
-                        foreach (var ability in player.AbilityUpgrades)
-                        {
-                            uniqueAbility.Add(ability.AbilityId);
-                        }
-                    }
-
-                    var abilities = uniqueAbility.ToArray();
-                    var isWin = player.PlayerSlot < 5 == matchData.Result.RadiantWin;
-
-                    playersMatches.Add(new PlayersMatches
-                    {
-                        AccountId = player.AccountId == 4294967295 ? player.PlayerSlot + 1 : player.AccountId,
-                        MatchId = matchData.Result.MatchId,
-                        Assists = player.Assists,
-                        Deaths = player.Deaths,
-                        Denies = player.Denies,
-                        GoldPerMin = player.GoldPerMin,
-                        HeroDamage = player.HeroDamage,
-                        HeroHealing = player.HeroHealing,
-                        Kills = player.Kills,
-                        LastHits = player.LastHits,
-                        NetWorth = player.NetWorth,
-                        TowerDamage = player.TowerDamage,
-                        XpPerMin = player.XpPerMin,
-                        Win = isWin ? 1 : 0,
-                        Ability0 = Ability.GetAbility(abilities.ElementAtOrDefault(0)),
-                        Ability1 = Ability.GetAbility(abilities.ElementAtOrDefault(1)),
-                        Ability2 = Ability.GetAbility(abilities.ElementAtOrDefault(2)),
-                        Ability3 = Ability.GetAbility(abilities.ElementAtOrDefault(3)),
-                        HeroLevel = player.Level,
-                        Team = player.TeamNumber,
-                        LeaverStatus = player.LeaverStatus
-                    });
-
-                    playerUnique.Add(JsonSerializer.Serialize(new
-                    {
-                        LocCountryCode = Regions.GetRegion(matchData.Result.Cluster),
-                        AccountId = player.AccountId == 4294967295 ? player.PlayerSlot + 1 : player.AccountId
-                    }));
-                }
+                matchesGameModeError = match_seq_number;
+                return null;
             }
-            catch (Exception ex)
+            var match = matchesData.result.matches[0];
+            if (matchesData?.result == null && match?.game_mode != 18 && match == null)
             {
-                Console.WriteLine($"Error processing matchDetails for {match_seq_number}: {ex.Message}");
+                matchesGameModeError = match_seq_number;
+                return null;
+            }
+            // Process match
+            matches.Add(new Match
+            {
+                match_id = match.match_id,
+                start_time = match.start_time,
+                match_seq_num = match.match_seq_num,
+                cluster = match.cluster,
+                dire_score = match.dire_score,
+                radiant_score = match.radiant_score,
+                duration = match.duration,
+                radiant_win = match.radiant_win
+            });
+            // Process players
+            foreach (var player in match.players)
+            {
+                var uniqueAbility = new HashSet<int>();
+                if (player.ability_upgrades != null)
+                {
+                    foreach (var ability in player.ability_upgrades)
+                    {
+                        uniqueAbility.Add(ability.ability);
+                    }
+                }
+                var abilities = uniqueAbility.ToArray();
+                var isWin = player.player_slot < 5 == match.radiant_win ? 1 : 0;
+                var score = player.assists * 1 - player.deaths * 1 + player.denies * 1 + player.denies * 1 + player.gold_per_min * 1;
+                var account_id = player.account_id == 4294967295 ? player.player_slot + 1 : player.account_id;
+                playersMatches.Add(new PlayersMatches
+                {
+                    account_id = account_id,
+                    match_id = match.match_id,
+                    assists = player.assists,
+                    deaths = player.deaths,
+                    denies = player.denies,
+                    gold_per_min = player.gold_per_min,
+                    hero_damage = player.hero_damage,
+                    hero_healing = player.hero_healing,
+                    kills = player.kills,
+                    last_hits = player.last_hits,
+                    net_worth = player.net_worth,
+                    tower_damage = player.tower_damage,
+                    xp_per_min = player.xp_per_min,
+                    win = (byte)isWin,
+                    ability_0 = abilities.ElementAtOrDefault(0),
+                    ability_1 = abilities.ElementAtOrDefault(1),
+                    ability_2 = abilities.ElementAtOrDefault(2),
+                    ability_3 = abilities.ElementAtOrDefault(3),
+                    hero_level = player.level,
+                    team = player.team_number,
+                    leaver_status = player.leaver_status,
+                    aghanims_scepter = player.aghanims_scepter,
+                    aghanims_shard = player.aghanims_shard,
+                    backpack_0 = player.backpack_0,
+                    backpack_1 = player.backpack_1,
+                    backpack_2 = player.backpack_2,
+                    hero_id = player.hero_id,
+                    moonshard = player.moonshard,
+                    item_neutral = player.item_neutral,
+                    item_0 = player.item_0,
+                    item_1 = player.item_1,
+                    item_2 = player.item_2,
+                    item_3 = player.item_3,
+                    item_4 = player.item_4,
+                    item_5 = player.item_5,
+                    player_slot = player.player_slot,
+                    score = score,
+                });
+                playersUnique.Add(account_id);
             }
         }
-
-        // Save errored matches
-        SaveMatchesGameModeError(matchesGameModeErrorPath, matchesGameModeError);
-
-        // Save data to the database
-        await _context.Match.AddRangeAsync(matches);
-        await _context.PlayersMatches.AddRangeAsync(playersMatches);
-        await _context.SaveChangesAsync();
-
-        foreach (var playerJson in playerUnique)
+        catch (Exception ex)
         {
-            var playerData = JsonSerializer.Deserialize<PlayerData>(playerJson);
-            await _context.Player
-                .Where(p => p.AccountId == playerData.AccountId)
-                .UpdateAsync(p => new Player
-                {
-                    LocCountryCode = playerData.LocCountryCode
-                });
+            Console.WriteLine($"Error processing matchDetails for {match_seq_number}: {ex.Message}");
         }
 
         Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
-        return new MatchDetailResponse { Matches = matches, PlayersMatches = playersMatches };
-    }
-
-    private async Task<DotaGetMatchHistoryBySequenceNumResponse> FetchMatchDetailsAsync(long match_seq_number)
-    {
-        using var httpClient = _httpClientFactory.CreateClient();
-        var response = await httpClient.GetAsync($"{Environment.GetEnvironmentVariable("BASE_URL")}/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1?matches_requested=1&start_at_match_seq_num={match_seq_number}&key={Environment.GetEnvironmentVariable("KEY_API")}");
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<DotaGetMatchHistoryBySequenceNumResponse>(content);
-    }
-
-    private HashSet<long> LoadMatchesGameModeError(string filePath)
-    {
-        if (File.Exists(filePath))
-        {
-            var content = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<HashSet<long>>(content) ?? new HashSet<long>();
-        }
-        return new HashSet<long>();
-    }
-
-    private void SaveMatchesGameModeError(string filePath, HashSet<long> matchesGameModeError)
-    {
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-        File.WriteAllText(filePath, JsonSerializer.Serialize(matchesGameModeError));
+        return new MatchDetailResponse { Matches = matches, PlayersMatches = playersMatches, PlayersUnique = playersUnique, MatchesGameModeError = matchesGameModeError };
     }
 }
 
 public class MatchDetailResponse
 {
-    public List<Match> Matches { get; set; }
-    public List<PlayersMatches> PlayersMatches { get; set; }
+    public required List<Match> Matches { get; set; }
+    public required List<PlayersMatches> PlayersMatches { get; set; }
+    public required HashSet<long>? PlayersUnique { get; set; }
+    public required long? MatchesGameModeError { get; set; }
 }
 
-public class PlayerData
-{
-    public string LocCountryCode { get; set; }
-    public long AccountId { get; set; }
-}

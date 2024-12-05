@@ -30,8 +30,8 @@ namespace dotatryhard.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("match_id"));
 
-                    b.Property<string>("cluster")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("cluster")
+                        .HasColumnType("int");
 
                     b.Property<short?>("dire_score")
                         .HasColumnType("smallint");
@@ -44,6 +44,9 @@ namespace dotatryhard.Migrations
 
                     b.Property<short?>("radiant_score")
                         .HasColumnType("smallint");
+
+                    b.Property<bool>("radiant_win")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<long?>("start_time")
                         .HasColumnType("bigint");
@@ -83,20 +86,20 @@ namespace dotatryhard.Migrations
                     b.Property<long>("match_id")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ability_0")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("ability_0")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ability_1")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("ability_1")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ability_2")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("ability_2")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ability_3")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("ability_3")
+                        .HasColumnType("int");
 
-                    b.Property<short?>("aghanims_scepter")
-                        .HasColumnType("smallint");
+                    b.Property<byte?>("aghanims_scepter")
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<short?>("aghanims_shard")
                         .HasColumnType("smallint");
@@ -128,29 +131,29 @@ namespace dotatryhard.Migrations
                     b.Property<int?>("hero_healing")
                         .HasColumnType("int");
 
-                    b.Property<string>("hero_id")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("hero_id")
+                        .HasColumnType("smallint");
 
                     b.Property<short?>("hero_level")
                         .HasColumnType("smallint");
 
-                    b.Property<string>("item_0")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("item_0")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("item_1")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("item_1")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("item_2")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("item_2")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("item_3")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("item_3")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("item_4")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("item_4")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("item_5")
-                        .HasColumnType("longtext");
+                    b.Property<short?>("item_5")
+                        .HasColumnType("smallint");
 
                     b.Property<short?>("item_neutral")
                         .HasColumnType("smallint");
@@ -164,8 +167,8 @@ namespace dotatryhard.Migrations
                     b.Property<byte?>("leaver_status")
                         .HasColumnType("tinyint unsigned");
 
-                    b.Property<short?>("moonshard")
-                        .HasColumnType("smallint");
+                    b.Property<byte?>("moonshard")
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<int?>("net_worth")
                         .HasColumnType("int");
@@ -182,8 +185,8 @@ namespace dotatryhard.Migrations
                     b.Property<int?>("tower_damage")
                         .HasColumnType("int");
 
-                    b.Property<bool>("win")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<byte>("win")
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<short?>("xp_per_min")
                         .HasColumnType("smallint");

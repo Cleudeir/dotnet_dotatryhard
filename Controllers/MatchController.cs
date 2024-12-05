@@ -1,8 +1,5 @@
-using dotatryhard.Data;
 using dotatryhard.Interfaces;
-using dotatryhard.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Controllers
 {
@@ -31,6 +28,7 @@ namespace dotatryhard.Controllers
             {
                 Matches = result.Value.Matches, // List of match IDs
                 Players = result.Value.Players, // List of player IDs
+        
             };
             return Ok(response);
         }

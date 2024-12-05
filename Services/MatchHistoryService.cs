@@ -7,8 +7,6 @@ namespace dotatryhard.Services
     public class MatchHistoryService : IMatchHistoryService
     {
         private readonly HttpClient _httpClient;
-        private readonly ApplicationDbContext _dbContext;
-        private readonly IConfiguration _configuration;
 
         public MatchHistoryService(
             HttpClient httpClient,
@@ -17,13 +15,9 @@ namespace dotatryhard.Services
         )
         {
             _httpClient = httpClient;
-            _dbContext = dbContext;
-            _configuration = configuration;
         }
 
-        public async Task<(List<long> Matches, List<int> Players)?> GetMatchHistoryAsync(
-            int accountId
-        )
+        public async Task<(List<MatchInfo> Matches, List<int> Players)?> GetMatchHistoryAsync(int accountId)
         {
             var startTime = DateTime.Now;
 
@@ -50,12 +44,16 @@ namespace dotatryhard.Services
                 // Filter out matches that already exist in the database
                 var newMatches = data.result.matches;
                 // Collect unique match IDs and player IDs
-                var matchesSet = new HashSet<long>();
+                var matchesSet = new HashSet<MatchInfo>();
                 var playersSet = new HashSet<int>();
 
                 foreach (var match in newMatches)
                 {
-                    matchesSet.Add(match.match_id);
+                    matchesSet.Add(new MatchInfo
+                    {
+                        id = match.match_id,
+                        seq_num = match.match_seq_num
+                    });
                     foreach (var player in match.players)
                     {
                         int playerAccountId = (int)(
@@ -68,8 +66,9 @@ namespace dotatryhard.Services
                 }
 
                 // Convert sets to lists
-                var matches = matchesSet.ToList();
+
                 var players = playersSet.ToList();
+                var matches = matchesSet.ToList();
 
                 Console.WriteLine($"Found {matches.Count} new matches.");
                 Console.WriteLine($"Found {players.Count} new players.");
@@ -88,3 +87,4 @@ namespace dotatryhard.Services
         }
     }
 }
+

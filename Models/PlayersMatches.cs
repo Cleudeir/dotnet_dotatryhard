@@ -15,32 +15,32 @@ namespace dotatryhard.Models
         public int? tower_damage { get; set; }
         public short? gold_per_min { get; set; }
         public short? xp_per_min { get; set; }
-        public string? ability_0 { get; set; }
-        public string? ability_1 { get; set; }
-        public string? ability_2 { get; set; }
-        public string? ability_3 { get; set; }
+        public int? ability_0 { get; set; }
+        public int? ability_1 { get; set; }
+        public int? ability_2 { get; set; }
+        public int? ability_3 { get; set; }
         public short? hero_level { get; set; }
         public byte? team { get; set; }
         public byte? leaver_status { get; set; }
-        public short? aghanims_scepter { get; set; }
+        public byte? aghanims_scepter { get; set; }
         public short? aghanims_shard { get; set; }
         public short? backpack_0 { get; set; }
         public short? backpack_1 { get; set; }
         public short? backpack_2 { get; set; }
-        public string? item_0 { get; set; }
-        public string? item_1 { get; set; }
-        public string? item_2 { get; set; }
-        public string? item_3 { get; set; }
-        public string? item_4 { get; set; }
-        public string? item_5 { get; set; }
+        public short? item_0 { get; set; }
+        public short? item_1 { get; set; }
+        public short? item_2 { get; set; }
+        public short? item_3 { get; set; }
+        public short? item_4 { get; set; }
+        public short? item_5 { get; set; }
         public short? item_neutral { get; set; }
-        public short? moonshard { get; set; }
-        public string? hero_id { get; set; }
+        public byte? moonshard { get; set; }
+        public short? hero_id { get; set; }
         public short? player_slot { get; set; }
-         public bool win { get; set; }
+        public byte win { get; set; }
         public int? score { get; set; }
 
-        public required Player player { get; set; }
-        public required Match match { get; set; }
+        public Player? player { get; set; }
+        public Match? match { get; set; }
     }
 }

@@ -1,7 +1,4 @@
-using dotatryhard.Data;
-using dotatryhard.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Controllers
 {
@@ -9,116 +6,25 @@ namespace dotatryhard.Controllers
     [ApiController]
     public class PlayersMatchesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly MatchDetailService _matchDetailService;
 
-        public PlayersMatchesController(ApplicationDbContext context)
+        public PlayersMatchesController(MatchDetailService matchDetailService)
         {
-            _context = context;
+            _matchDetailService = matchDetailService;
         }
-
-        // GET: api/PlayersMatches
-        [HttpGet]
-        public async Task<IActionResult> GetPlayersMatches()
+        
+        // GET: api/PlayersMatches/{match_seq_number}
+        [HttpGet("{match_seq_number}")]
+        public async Task<IActionResult> GetPlayersMatch(long match_seq_number)
         {
-            var playersMatches = await _context
-                .PlayersMatches.Include(pm => pm.player)
-                .Include(pm => pm.match)
-                .ToListAsync();
-            return Ok(playersMatches);
-        }
-
-        // GET: api/PlayersMatches/{accountId}/{matchId}
-        [HttpGet("{accountId}/{matchId}")]
-        public async Task<IActionResult> GetPlayersMatch(long accountId, long matchId)
-        {
-            var playersMatch = await _context
-                .PlayersMatches.Include(pm => pm.player)
-                .Include(pm => pm.match)
-                .FirstOrDefaultAsync(pm => pm.account_id == accountId && pm.match_id == matchId);
-
-            if (playersMatch == null)
+            MatchDetailResponse? matchDetails = await _matchDetailService.GetMatchDetailsAsync(match_seq_number);
+            if (matchDetails == null)
             {
                 return NotFound();
             }
 
-            return Ok(playersMatch);
+            return Ok(matchDetails);
         }
 
-        // POST: api/PlayersMatches
-        [HttpPost]
-        public async Task<IActionResult> CreatePlayersMatch([FromBody] PlayersMatches playersMatch)
-        {
-            if (playersMatch == null)
-            {
-                return BadRequest();
-            }
-
-            _context.PlayersMatches.Add(playersMatch);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(
-                nameof(GetPlayersMatch),
-                new { accountId = playersMatch.account_id, matchId = playersMatch.match_id },
-                playersMatch
-            );
-        }
-
-        // PUT: api/PlayersMatches/{accountId}/{matchId}
-        [HttpPut("{accountId}/{matchId}")]
-        public async Task<IActionResult> UpdatePlayersMatch(
-            long accountId,
-            long matchId,
-            [FromBody] PlayersMatches updatedPlayersMatch
-        )
-        {
-            if (
-                updatedPlayersMatch == null
-                || accountId != updatedPlayersMatch.account_id
-                || matchId != updatedPlayersMatch.match_id
-            )
-            {
-                return BadRequest();
-            }
-
-            var playersMatch = await _context.PlayersMatches.FirstOrDefaultAsync(pm =>
-                pm.account_id == accountId && pm.match_id == matchId
-            );
-
-            if (playersMatch == null)
-            {
-                return NotFound();
-            }
-
-            // Update the properties
-            playersMatch.assists = updatedPlayersMatch.assists;
-            playersMatch.deaths = updatedPlayersMatch.deaths;
-            playersMatch.kills = updatedPlayersMatch.kills;
-            playersMatch.gold_per_min = updatedPlayersMatch.gold_per_min;
-            playersMatch.xp_per_min = updatedPlayersMatch.xp_per_min;
-
-            _context.PlayersMatches.Update(playersMatch);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // DELETE: api/PlayersMatches/{accountId}/{matchId}
-        [HttpDelete("{accountId}/{matchId}")]
-        public async Task<IActionResult> DeletePlayersMatch(long accountId, long matchId)
-        {
-            var playersMatch = await _context.PlayersMatches.FirstOrDefaultAsync(pm =>
-                pm.account_id == accountId && pm.match_id == matchId
-            );
-
-            if (playersMatch == null)
-            {
-                return NotFound();
-            }
-
-            _context.PlayersMatches.Remove(playersMatch);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
     }
 }
