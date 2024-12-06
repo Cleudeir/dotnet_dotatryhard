@@ -1,13 +1,12 @@
 using dotatryhard.Data;
 using dotatryhard.Interfaces;
 using dotatryhard.Services;
-using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-
-var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env
 DotNetEnv.Env.Load();
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -18,21 +17,23 @@ builder.Services.AddHttpClient();
 // Configure MySQL Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-        .Replace("${MYSQL_HOST}", Environment.GetEnvironmentVariable("MYSQL_HOST"))
-        .Replace("${MYSQL_PORT}", Environment.GetEnvironmentVariable("MYSQL_PORT"))
-        .Replace("${MYSQL_DATABASE}", Environment.GetEnvironmentVariable("MYSQL_DATABASE"))
-        .Replace("${MYSQL_USER}", Environment.GetEnvironmentVariable("MYSQL_USER"))
-        .Replace("${MYSQL_PASSWORD}", Environment.GetEnvironmentVariable("MYSQL_PASSWORD"));
+    // Build connection string using environment variables
+    var connectionStringTemplate = builder.Configuration.GetConnectionString("DefaultConnection");
+    var connectionString = connectionStringTemplate
+        .Replace("${MYSQL_HOST}", Environment.GetEnvironmentVariable("MYSQL_HOST") ?? "localhost")
+        .Replace("${MYSQL_PORT}", Environment.GetEnvironmentVariable("MYSQL_PORT") ?? "3306")
+        .Replace("${MYSQL_DATABASE}", Environment.GetEnvironmentVariable("MYSQL_DATABASE") ?? "database")
+        .Replace("${MYSQL_USER}", Environment.GetEnvironmentVariable("MYSQL_USER") ?? "user")
+        .Replace("${MYSQL_PASSWORD}", Environment.GetEnvironmentVariable("MYSQL_PASSWORD") ?? "password");
 
+    // Configure MySQL provider
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 27)));
 });
 
-// Register application services
+// Register services for dependency injection
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
-
-// FIX: Register MatchDetailService
 builder.Services.AddScoped<MatchDetailService>();
+builder.Services.AddScoped<ISteamUserService, PlayerProfileService>();
 
 var app = builder.Build();
 

@@ -1,6 +1,5 @@
-using dotatryhard.Models; // Import the namespace containing the entity models (Match, Player, PlayersMatches)
-using Microsoft.EntityFrameworkCore; // Import Entity Framework Core for database interactions
-
+using dotatryhard.Models;
+using Microsoft.EntityFrameworkCore;
 namespace dotatryhard.Data
 {
 

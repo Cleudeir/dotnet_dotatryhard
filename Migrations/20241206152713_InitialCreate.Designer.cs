@@ -12,7 +12,7 @@ using dotatryhard.Data;
 namespace dotatryhard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241205115025_InitialCreate")]
+    [Migration("20241206152713_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

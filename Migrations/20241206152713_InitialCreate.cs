@@ -12,14 +12,13 @@ namespace dotatryhard.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
+               ;
 
             migrationBuilder.CreateTable(
                 name: "Matches",
                 columns: table => new
                 {
-                    match_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    match_id = table.Column<long>(type: "bigint", nullable: false),
                     match_seq_num = table.Column<long>(type: "bigint", nullable: true),
                     start_time = table.Column<long>(type: "bigint", nullable: true),
                     cluster = table.Column<int>(type: "int", nullable: true),
@@ -32,26 +31,26 @@ namespace dotatryhard.Migrations
                 {
                     table.PrimaryKey("PK_Matches", x => x.match_id);
                 })
-                .Annotation("MySql:CharSet", "utf8mb4");
+               ;
 
             migrationBuilder.CreateTable(
                 name: "Players",
                 columns: table => new
                 {
                     account_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                     ,
                     personaname = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                        ,
                     avatarfull = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                       ,
                     loccountrycode = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Players", x => x.account_id);
                 })
-                .Annotation("MySql:CharSet", "utf8mb4");
+               ;
 
             migrationBuilder.CreateTable(
                 name: "PlayersMatches",
@@ -111,7 +110,7 @@ namespace dotatryhard.Migrations
                         principalColumn: "account_id",
                         onDelete: ReferentialAction.Cascade);
                 })
-                .Annotation("MySql:CharSet", "utf8mb4");
+               ;
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlayersMatches_match_id",

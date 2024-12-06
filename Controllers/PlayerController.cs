@@ -1,36 +1,34 @@
-using dotatryhard.Data;
-using dotatryhard.Models;
+using dotatryhard.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dotatryhard.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class PlayerController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ISteamUserService _playerProfileResponse;
 
-        public PlayerController(ApplicationDbContext context)
+        public PlayerController(ISteamUserService playerProfileResponse)
         {
-            _context = context;
+            _playerProfileResponse = playerProfileResponse;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPlayers()
+        // http://localhost:5034/api/Player/87683422
+        [HttpGet("{accountId}")]
+        public async Task<IActionResult> GetPlayer(long accountId)
         {
-            return Ok(await _context.Players.ToListAsync());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreatePlayer([FromBody] Player player)
-        {
-            if (player == null)
-                return BadRequest();
-
-            await _context.Players.AddAsync(player);
-            await _context.SaveChangesAsync();
-            return Ok(player);
+            var result = await _playerProfileResponse.FetchProfilesAsync(accountId);
+            if (result == null)
+            {
+                return NotFound(new { message = "No new match history found." });
+            }
+            // Structure the JSON response
+            var response = new
+            {
+                Player = result,
+            };
+            return Ok(response);
         }
     }
 }
