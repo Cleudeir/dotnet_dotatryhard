@@ -8,6 +8,10 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging to ignore database logs
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
+builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
+
 // Add services to the container
 builder.Services.AddControllers();
 
@@ -34,6 +38,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 builder.Services.AddScoped<MatchDetailService>();
 builder.Services.AddScoped<ISteamUserService, PlayerProfileService>();
+// Register MatchHistoryBot as a hosted service
+builder.Services.AddSingleton<IHostedService, DataPopulationService>();
 
 var app = builder.Build();
 

@@ -4,8 +4,5 @@ using dotatryhard.Models;
 
 namespace dotatryhard.Repositories
 {
-  public class NewClass
-    {
-        
-    }
+
 }

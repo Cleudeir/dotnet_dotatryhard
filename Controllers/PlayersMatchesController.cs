@@ -14,7 +14,7 @@ namespace dotatryhard.Controllers
         {
             _matchDetailService = matchDetailService;
         }
-        
+
         // GET: http://localhost:5034/api/PlayersMatches/6783727637
         [HttpGet("{match_seq_number}")]
         public async Task<IActionResult> GetPlayersMatch(long match_seq_number)
@@ -24,7 +24,13 @@ namespace dotatryhard.Controllers
             {
                 return NotFound();
             }
-
+            // Structure the JSON response
+            var response = new
+            {
+                match = matchDetails.Match,
+                players = matchDetails.Players,
+                playersMatches = matchDetails.PlayersMatches                
+            };
             return Ok(matchDetails);
         }
 
