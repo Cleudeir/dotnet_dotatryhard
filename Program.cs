@@ -13,7 +13,9 @@ builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
 builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
 
 // Add services to the container
-builder.Services.AddControllers();
+builder.Services.AddControllers(); // Enable MVC and REST API controllers
+builder.Services.AddEndpointsApiExplorer(); // Add API endpoint explorer for Swagger
+builder.Services.AddSwaggerGen(); // Add Swagger for API documentation
 
 // Register HttpClient for dependency injection
 builder.Services.AddHttpClient();
@@ -34,19 +36,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 27)));
 });
 
+// Register the hosted service
+builder.Services.AddHostedService<DataPopulationService>();
+
 // Register services for dependency injection
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 builder.Services.AddScoped<MatchDetailService>();
 builder.Services.AddScoped<ISteamUserService, PlayerProfileService>();
-// Register MatchHistoryBot as a hosted service
-builder.Services.AddSingleton<IHostedService, DataPopulationService>();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+
+    app.UseDeveloperExceptionPage(); // Enable detailed errors in development
+    app.UseSwagger(); // Enable Swagger in development
+    app.UseSwaggerUI(); // Enable Swagger UI for API exploration
 }
 
 app.UseHttpsRedirection();

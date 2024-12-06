@@ -1,7 +1,6 @@
 using dotatryhard.Interfaces;
 using dotatryhard.Data;
 using dotatryhard.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace dotatryhard.Services
 {
@@ -9,6 +8,8 @@ namespace dotatryhard.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<DataPopulationService> _logger;
+        private Task? _backgroundTask;
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         public DataPopulationService(
             IServiceProvider serviceProvider,
@@ -18,7 +19,17 @@ namespace dotatryhard.Services
             _logger = logger;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("DataPopulationService is starting...");
+
+            // Start the background task
+            _backgroundTask = Task.Run(() => RunBackgroundTask(_cancellationTokenSource.Token), cancellationToken);
+
+            return Task.CompletedTask; // Don't block the application startup
+        }
+
+        private async Task RunBackgroundTask(CancellationToken cancellationToken)
         {
             var processedAccounts = new HashSet<long>();
             var accountQueue = new Queue<long>();
@@ -88,12 +99,11 @@ namespace dotatryhard.Services
                                 {
                                     if (playerProfile.account_id == accountId)
                                     {
-                                        updatePlayerProfileToDatabase(dbContext, playerProfile);
+                                        UpdatePlayerProfileToDatabase(dbContext, playerProfile);
                                     }
                                     else
                                     {
                                         SavePlayerProfileToDatabase(dbContext, playerProfile);
-
                                     }
                                 }
                             }
@@ -109,7 +119,7 @@ namespace dotatryhard.Services
                 await Task.Delay(1000, cancellationToken);
             }
 
-            _logger.LogInformation("DataPopulationService completed.");
+            _logger.LogInformation("DataPopulationService background task completed.");
         }
 
         private void SaveMatchDetailsToDatabase(ApplicationDbContext dbContext, MatchDetailResponse matchDetails)
@@ -157,7 +167,7 @@ namespace dotatryhard.Services
             }
         }
 
-        private void updatePlayerProfileToDatabase(ApplicationDbContext dbContext, Player playerProfile)
+        private void UpdatePlayerProfileToDatabase(ApplicationDbContext dbContext, Player playerProfile)
         {
             try
             {
@@ -179,10 +189,19 @@ namespace dotatryhard.Services
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("DataPopulationService is stopping.");
-            return Task.CompletedTask;
+
+            // Cancel the background task
+            _cancellationTokenSource.Cancel();
+
+            if (_backgroundTask != null)
+            {
+                await Task.WhenAny(_backgroundTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            }
+
+            _logger.LogInformation("DataPopulationService stopped.");
         }
     }
 }
