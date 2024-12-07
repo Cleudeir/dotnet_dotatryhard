@@ -83,7 +83,7 @@ namespace dotatryhard.Interfaces
         public int scaled_hero_damage { get; set; }
         public int scaled_tower_damage { get; set; }
         public int scaled_hero_healing { get; set; }
-        public required List<AbilityUpgradeMatchHistoryBySequence> ability_upgrades { get; set; }
+        public List<AbilityUpgradeMatchHistoryBySequence>? ability_upgrades { get; set; }
     }
 
 }

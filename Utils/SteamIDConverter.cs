@@ -1,4 +1,4 @@
-namespace dotatryhard.Utils;
+namespace dotatryhard.Utils{
 class SteamIDConverter
 {
     public static long ConvertAccountIDToSteamID64(long accountID)
@@ -11,3 +11,5 @@ class SteamIDConverter
     }
 
 }
+}
+

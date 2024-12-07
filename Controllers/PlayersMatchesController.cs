@@ -1,6 +1,7 @@
 using dotatryhard.Services;
 using Microsoft.AspNetCore.Mvc;
 using dotatryhard.Interfaces;
+using dotatryhard.Models;
 
 namespace dotatryhard.Controllers
 {
@@ -8,11 +9,12 @@ namespace dotatryhard.Controllers
     [ApiController]
     public class PlayersMatchesController : ControllerBase
     {
-        private readonly MatchDetailService _matchDetailService;
+        private readonly PlayersMatchesService _matchDetailService;
 
-        public PlayersMatchesController(MatchDetailService matchDetailService)
+        public PlayersMatchesController(PlayersMatchesService matchDetailService)
         {
             _matchDetailService = matchDetailService;
+        
         }
 
         // GET: http://localhost:5034/api/PlayersMatches/6783727637
@@ -24,14 +26,21 @@ namespace dotatryhard.Controllers
             {
                 return NotFound();
             }
-            // Structure the JSON response
-            var response = new
-            {
-                match = matchDetails.Match,
-                players = matchDetails.Players,
-                playersMatches = matchDetails.PlayersMatches                
-            };
             return Ok(matchDetails);
+        }
+        // GET: http://localhost:5034/api/PlayersMatches/average
+         [HttpGet("average")]
+        public async Task<IActionResult> GetAverageData()
+        {
+            try
+            {            
+                var averageData = await  _matchDetailService.GetAllWithAveragesAsync();
+                return Ok(averageData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing the request.", details = ex.Message });
+            }
         }
 
     }

@@ -54,7 +54,7 @@ namespace dotatryhard.Services
                 {
                     var matchHistoryService = scope.ServiceProvider.GetRequiredService<IMatchHistoryService>();
                     var playerProfileService = scope.ServiceProvider.GetRequiredService<ISteamUserService>();
-                    var matchDetailService = scope.ServiceProvider.GetRequiredService<MatchDetailService>();
+                    var matchDetailService = scope.ServiceProvider.GetRequiredService<PlayersMatchesService>();
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
                     try

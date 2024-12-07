@@ -37,11 +37,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 // Register the hosted service
-builder.Services.AddHostedService<DataPopulationService>();
+//builder.Services.AddHostedService<DataPopulationService>();
 
 // Register services for dependency injection
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
-builder.Services.AddScoped<MatchDetailService>();
+builder.Services.AddScoped<PlayersMatchesService>();
 builder.Services.AddScoped<ISteamUserService, PlayerProfileService>();
 
 

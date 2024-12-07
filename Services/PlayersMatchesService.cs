@@ -1,14 +1,24 @@
 using System.Text.Json;
+using dotatryhard.Data;
 using dotatryhard.Interfaces;
 using dotatryhard.Models;
+using dotatryhard.Utils;
+using Microsoft.EntityFrameworkCore;
 namespace dotatryhard.Services
 {
-    public class MatchDetailService : IMatchDetailService
+    public class PlayersMatchesService : IMatchDetailService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        public MatchDetailService(IHttpClientFactory httpClientFactory)
+
+        // Memory cache for   var cache = new Cache<string, string>();
+        private readonly Cache<string, AllWithAveragesResponse> _cache = new(100);
+
+        private readonly ApplicationDbContext _dbContext;
+
+        public PlayersMatchesService(IHttpClientFactory httpClientFactory, ApplicationDbContext dbContext)
         {
             _httpClientFactory = httpClientFactory;
+            _dbContext = dbContext;
         }
 
         public async Task<MatchDetailResponse?> GetMatchDetailsAsync(long match_seq_number)
@@ -159,8 +169,65 @@ namespace dotatryhard.Services
             Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
             return new MatchDetailResponse { Match = newMatch, PlayersMatches = playersMatches, Players = players };
         }
-    }
 
-    
+        public async Task<AllWithAveragesResponse?> GetAllWithAveragesAsync()
+        {
+
+            var startTime = DateTime.Now;
+            const string cacheKey = "GetAllWithAverages";
+            Console.WriteLine("AllWithAveragesResponse");
+
+            // Check if the result is already in cache
+            var cachedResponse = _cache.Get(cacheKey);
+
+            //log
+            Console.WriteLine($"Cache status for GetAllWithAverages: {cachedResponse}");
+
+            if (cachedResponse != null)
+            {
+                Console.WriteLine($"Cache hit for GetAllWithAverages {(DateTime.Now - startTime).TotalSeconds} seconds");
+                return cachedResponse;
+            }
+
+            List<PlayersMatches> playersMatches = await _dbContext.Set<PlayersMatches>().ToListAsync();
+
+            if (playersMatches == null || !playersMatches.Any())
+                return null;
+
+            var averages = new Dictionary<string, double>
+            {
+                { "kills", playersMatches.Average(pm => pm.kills ?? 0) },
+                { "deaths", playersMatches.Average(pm => pm.deaths ?? 0) },
+                { "assists", playersMatches.Average(pm => pm.assists ?? 0) },
+                { "lastHits", playersMatches.Average(pm => pm.last_hits ?? 0) },
+                { "denies", playersMatches.Average(pm => pm.denies ?? 0) },
+                { "heroDamage", playersMatches.Average(pm => pm.hero_damage ?? 0) },
+                { "heroHealing", playersMatches.Average(pm => pm.hero_healing ?? 0) },
+                { "netWorth", playersMatches.Average(pm => pm.net_worth ?? 0) },
+                { "towerDamage", playersMatches.Average(pm => pm.tower_damage ?? 0) },
+                { "goldPerMin", playersMatches.Average(pm => pm.gold_per_min ?? 0) },
+                { "xpPerMin", playersMatches.Average(pm => pm.xp_per_min ?? 0) },
+                { "heroLevel", playersMatches.Average(pm => pm.hero_level ?? 0) },
+                { "score", playersMatches.Average(pm => pm.score ?? 0) },
+                { "winRate", playersMatches.Count(pm => pm.win == 1) / (double)playersMatches.Count * 100 }
+            };
+
+            var result = new AllWithAveragesResponse
+            {
+                PlayersMatches = playersMatches,
+                Averages = averages
+            };
+
+
+            // Save result in cache
+            _cache.Set(cacheKey, result);
+            Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
+            return new AllWithAveragesResponse
+            {
+                PlayersMatches = playersMatches,
+                Averages = averages
+            };
+        }
+    }
 
 }
