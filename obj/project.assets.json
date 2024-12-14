@@ -7416,11 +7416,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/dotatryhard.csproj",
+      "projectUniqueName": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
       "projectName": "dotatryhard",
-      "projectPath": "/home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/dotatryhard.csproj",
+      "projectPath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
       "packagesPath": "/home/cleudeir/.nuget/packages/",
-      "outputPath": "/home/cleudeir/Documents/_Pessoal/dotnet_dotatryhard/obj/",
+      "outputPath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/cleudeir/.nuget/NuGet/NuGet.Config"
