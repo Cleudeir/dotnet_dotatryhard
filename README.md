@@ -1,8 +1,7 @@
-
-                # launchSettings.json                
-                ## project structure
-                ```                    
-                dotnet_dotatryhard/
+# dotnet_dotatryhard                
+## project structure
+```                    
+dotnet_dotatryhard/
     README.md
     appsettings.json
     dotatryhard.csproj
@@ -49,8 +48,8 @@
         20241206152713_InitialCreate.Designer.cs
         ApplicationDbContextModelSnapshot.cs
         20241206152713_InitialCreate.cs                
-                ```
-                ## Sumário do Projeto `dotatryhard`
+```
+## Sumário do Projeto
 
 ### Propósito e Descrição do Projeto
 
