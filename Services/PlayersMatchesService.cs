@@ -174,15 +174,13 @@ namespace dotatryhard.Services
             const string cacheKey = "GetAllAverages";
             // Check if the result is already in cache
             var cachedResponse = _cache.Get(cacheKey);
-            //log
-            Console.WriteLine($"Cache status for GetAllWithAverages: {cachedResponse}");
 
             if (cachedResponse != null)
             {
                 Console.WriteLine(
                     $"Cache hit for GetAllWithAverages {(DateTime.Now - startTime).TotalSeconds} seconds"
                 );
-                // return cachedResponse;
+                return cachedResponse;
             }
 
             List<PlayersMatchesAverages> listAverages = await _dbContext
@@ -232,7 +230,7 @@ namespace dotatryhard.Services
                                 + avg.last_hits * weight.last_hits
                                 + avg.denies * weight.denies
                                 + avg.kills * weight.kills
-                                + avg.deaths * weight.deaths
+                                - avg.deaths * weight.deaths
                                 + avg.gold_per_min * weight.gold_per_min
                                 + avg.hero_damage * weight.hero_damage
                                 + avg.hero_healing * weight.hero_healing
@@ -248,7 +246,7 @@ namespace dotatryhard.Services
                     {
                         score = score_avg,
                         account_id = avg.account_id,
-                        match_count = avg.match_count ?? 0,
+                        matches = avg.match_count ?? 0,
                         assists = avg.assists ?? 0,
                         deaths = avg.deaths ?? 0,
                         denies = avg.denies ?? 0,
@@ -260,16 +258,20 @@ namespace dotatryhard.Services
                         net_worth = avg.net_worth ?? 0,
                         tower_damage = avg.tower_damage ?? 0,
                         xp_per_min = avg.xp_per_min ?? 0,
-                        win = avg.win ?? 0,
-                        aghanims_scepter = avg.aghanims_scepter ?? 0,
-                        aghanims_shard = avg.aghanims_shard ?? 0,
+                        win_rate = avg.win / avg.match_count * 100 ?? 0,
+                        aghanims_scepter = avg.aghanims_scepter / avg.match_count * 100 ?? 0,
+                        aghanims_shard = avg.aghanims_shard / avg.match_count * 100 ?? 0,
                         hero_level = avg.hero_level ?? 0,
-                        leaver_status = avg.leaver_status ?? 0,
-                        moonshard = avg.moonshard ?? 0,
+                        leaver_status = avg.leaver_status / avg.match_count * 100 ?? 0,
+                        moonshard = avg.moonshard / avg.match_count * 100 ?? 0,
                     };
-                    Console.WriteLine($"Score: {newAvg.score}"); // Consider removing this in production
                     return newAvg;
                 })
+                .ToList();
+
+            //PlayersMatchesAveragesList order list to score
+            var PlayersMatchesAveragesOrder = PlayersMatchesAveragesList
+                .OrderByDescending(avg => avg.score)
                 .ToList();
 
             var kills = listAverages.Average(pm => pm.kills ?? 0);
@@ -292,7 +294,7 @@ namespace dotatryhard.Services
                     + lastHits * weight.last_hits
                     + denies * weight.denies
                     + kills * weight.kills
-                    + deaths * weight.deaths
+                    - deaths * weight.deaths
                     + goldPerMin * weight.gold_per_min
                     + heroDamage * weight.hero_damage
                     + heroHealing * weight.hero_healing
@@ -303,7 +305,6 @@ namespace dotatryhard.Services
                 ) / totalWeight
             );
 
-            Console.WriteLine($"Score: {score}");
             var averages = new AveragesAllResponse
             {
                 assists = assists,
@@ -324,7 +325,7 @@ namespace dotatryhard.Services
 
             var result = new AllWithAveragesResponse
             {
-                PlayersMatches = PlayersMatchesAveragesList,
+                PlayersMatches = PlayersMatchesAveragesOrder,
                 Averages = averages,
             };
 

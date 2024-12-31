@@ -19,7 +19,7 @@ namespace dotatryhard.Interfaces
     public class AveragesResponse
     {
         public long account_id { get; set; }
-        public int match_count { get; set; }
+        public int matches { get; set; }
         public int last_hits { get; set; }
         public int denies { get; set; }
         public int assists { get; set; }
@@ -36,7 +36,7 @@ namespace dotatryhard.Interfaces
         public int aghanims_scepter { get; set; }
         public int aghanims_shard { get; set; }
         public int moonshard { get; set; }
-        public int win { get; set; }
+        public int win_rate { get; set; }
         public int score { get; set; }
     }
 

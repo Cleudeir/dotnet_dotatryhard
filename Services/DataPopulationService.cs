@@ -62,8 +62,26 @@ namespace dotatryhard.Services
                         scope.ServiceProvider.GetRequiredService<ISteamUserService>();
                     var matchDetailService =
                         scope.ServiceProvider.GetRequiredService<PlayersMatchesService>();
+
                     var dbContext =
                         scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                    if (accountQueue.Count <= 1)
+                    {
+                        var AllPlayersMatchesAverages =
+                            await matchDetailService.GetAllWithAveragesAsync();
+                        if (AllPlayersMatchesAverages != null)
+                        {
+                            // accountQueue.Enqueue(player);
+                            var PlayersMatches = AllPlayersMatchesAverages.PlayersMatches;
+                            // first 2000 players
+                            var PlayersMatchesLimited = PlayersMatches.Take(2000).ToList();
+                            foreach (var player in PlayersMatchesLimited)
+                            {
+                                accountQueue.Enqueue(player.account_id);
+                            }
+                        }
+                    }
 
                     try
                     {
@@ -117,7 +135,6 @@ namespace dotatryhard.Services
 
                         if (matchHistory?.Matches != null)
                         {
-                            // Batch check for existing players
                             var matchesToCheck = matchHistory.Value.Matches;
                             Console.WriteLine($"Matches to check: {matchesToCheck.Count}");
                             var matchIdsToCheck = matchesToCheck.Select(m => m.id);
@@ -134,7 +151,7 @@ namespace dotatryhard.Services
                             Console.WriteLine($"New matches to process: {newMatches.Count}");
                             Console.WriteLine($"-----------------------------");
 
-                            foreach (MatchInfo matchId in newMatches)
+                            foreach (MatchInfo matchId in matchHistory.Value.Matches)
                             {
                                 // Add delay before fetching match details
                                 await Task.Delay(TimeSpan.FromSeconds(delay), cancellationToken);
@@ -158,10 +175,8 @@ namespace dotatryhard.Services
                 }
 
                 // Delay to avoid overloading the API (additional delay if needed)
-
                 // Add player account IDs to the queue for further processing
 
-                // accountQueue.Enqueue(player);
 
                 await Task.Delay(1000, cancellationToken);
             }
@@ -173,8 +188,11 @@ namespace dotatryhard.Services
         {
             try
             {
+                if (dbContext.Matches.Any(m => m.match_id == match.match_id))
+                {
+                    return;
+                }
                 dbContext.Matches.Add(match);
-                Console.WriteLine($" Match saved to database: {match.match_id}");
                 dbContext.SaveChanges();
             }
             catch (Exception ex)
@@ -190,16 +208,13 @@ namespace dotatryhard.Services
         {
             try
             {
-                Console.WriteLine($"-----------------------------");
-
                 if (
                     matchDetails == null
                     || matchDetails.PlayersMatches == null
                     || !matchDetails.PlayersMatches.Any()
                 )
                 {
-                    Console.WriteLine("No PlayersMatches to save.");
-                    return; // Important: Exit early if there's nothing to process
+                    return;
                 }
 
                 var playersMatchesToCheck = matchDetails.PlayersMatches;
@@ -224,7 +239,6 @@ namespace dotatryhard.Services
 
                 if (!newData.Any())
                 {
-                    Console.WriteLine("No new PlayersMatches to save.");
                     return;
                 }
 
@@ -247,13 +261,7 @@ namespace dotatryhard.Services
         {
             try
             {
-                Console.WriteLine($"-----------------------------");
-                // Batch check for existing
                 var playersMatchesAverageToCheck = matchDetails.playersMatchesAverages;
-                Console.WriteLine(
-                    $"PlayersMatchesAverage to check: {playersMatchesAverageToCheck.Count}"
-                );
-
                 foreach (var avg in playersMatchesAverageToCheck)
                 {
                     // Check if the record already exists based on account_id
@@ -262,15 +270,11 @@ namespace dotatryhard.Services
                     );
                     if (existingAvg == null)
                     {
-                        Console.WriteLine($" Averages saved to database: {avg.account_id}");
-                        // Add the new averages if it doesn't already exist
                         dbContext.PlayersMatchesAverages.Add(avg);
                         dbContext.SaveChanges();
                     }
                     else
                     {
-                        Console.WriteLine($" Averages updated to database: {avg.account_id}");
-                        // Update averages if an existing record is found
                         existingAvg.assists = (avg.assists + existingAvg.assists) / 2;
                         existingAvg.deaths = (avg.deaths + existingAvg.deaths) / 2;
                         existingAvg.denies = (avg.denies + existingAvg.denies) / 2;
