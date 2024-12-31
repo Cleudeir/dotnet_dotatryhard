@@ -7,5 +7,3 @@ namespace dotatryhard.Interfaces
         Task<Player?> FetchProfilesAsync(long accountId);
     }
 }
-
-

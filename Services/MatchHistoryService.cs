@@ -8,16 +8,16 @@ namespace dotatryhard.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ApplicationDbContext _dbContext;
-        public MatchHistoryService(
-            HttpClient httpClient,
-            ApplicationDbContext dbContext       
-        )
+
+        public MatchHistoryService(HttpClient httpClient, ApplicationDbContext dbContext)
         {
             _httpClient = httpClient;
-             _dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
-        public async Task<(List<MatchInfo> Matches, List<long> Players)?> GetMatchHistoryAsync(long accountId)
+        public async Task<(List<MatchInfo> Matches, List<long> Players)?> GetMatchHistoryAsync(
+            long accountId
+        )
         {
             var startTime = DateTime.Now;
 
@@ -49,12 +49,9 @@ namespace dotatryhard.Services
 
                 foreach (var match in newMatches)
                 {
-                    
-                    matchesSet.Add(new MatchInfo
-                    {
-                        id = match.match_id,
-                        seq_num = match.match_seq_num
-                    });
+                    matchesSet.Add(
+                        new MatchInfo { id = match.match_id, seq_num = match.match_seq_num }
+                    );
                     foreach (var player in match.players)
                     {
                         int playerAccountId = (int)(
@@ -86,8 +83,5 @@ namespace dotatryhard.Services
                 return null;
             }
         }
-
-  
     }
 }
-

@@ -1,4 +1,3 @@
-
 namespace dotatryhard.Models
 {
     public class PlayersMatches
@@ -39,8 +38,6 @@ namespace dotatryhard.Models
         public short? hero_id { get; set; }
         public short? player_slot { get; set; }
         public byte win { get; set; }
-        public int? score { get; set; }
-
         public Player? player { get; set; }
         public Match? match { get; set; }
     }

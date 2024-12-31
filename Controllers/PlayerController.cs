@@ -26,7 +26,10 @@ namespace dotatryhard.Controllers
             // Structure the JSON response
             var response = new
             {
-                Player = result,
+                account_id = result.account_id,
+                personaname = result.personaname,
+                avatarfull = result.avatarfull,
+                loccountrycode = result.loccountrycode,
             };
             return Ok(response);
         }

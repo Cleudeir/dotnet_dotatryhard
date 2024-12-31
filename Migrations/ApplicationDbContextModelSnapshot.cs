@@ -80,10 +80,10 @@ namespace dotatryhard.Migrations
 
             modelBuilder.Entity("dotatryhard.Models.PlayersMatches", b =>
                 {
-                    b.Property<long>("account_id")
+                    b.Property<long>("match_id")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("match_id")
+                    b.Property<long>("account_id")
                         .HasColumnType("bigint");
 
                     b.Property<int?>("ability_0")
@@ -176,9 +176,6 @@ namespace dotatryhard.Migrations
                     b.Property<short?>("player_slot")
                         .HasColumnType("smallint");
 
-                    b.Property<int?>("score")
-                        .HasColumnType("int");
-
                     b.Property<byte?>("team")
                         .HasColumnType("tinyint unsigned");
 
@@ -191,11 +188,80 @@ namespace dotatryhard.Migrations
                     b.Property<short?>("xp_per_min")
                         .HasColumnType("smallint");
 
-                    b.HasKey("account_id", "match_id");
+                    b.HasKey("match_id", "account_id");
+
+                    b.HasIndex("account_id");
+
+                    b.ToTable("PlayersMatches");
+                });
+
+            modelBuilder.Entity("dotatryhard.Models.PlayersMatchesAverages", b =>
+                {
+                    b.Property<long>("account_id")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("aghanims_scepter")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("aghanims_shard")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("assists")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("deaths")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("denies")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("gold_per_min")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("hero_damage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("hero_healing")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("hero_level")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("kills")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("last_hits")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("leaver_status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("match_count")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("match_id")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("moonshard")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("net_worth")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("tower_damage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("win")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("xp_per_min")
+                        .HasColumnType("int");
+
+                    b.HasKey("account_id");
 
                     b.HasIndex("match_id");
 
-                    b.ToTable("PlayersMatches");
+                    b.ToTable("PlayersMatchesAverages");
                 });
 
             modelBuilder.Entity("dotatryhard.Models.PlayersMatches", b =>
@@ -217,14 +283,33 @@ namespace dotatryhard.Migrations
                     b.Navigation("player");
                 });
 
+            modelBuilder.Entity("dotatryhard.Models.PlayersMatchesAverages", b =>
+                {
+                    b.HasOne("dotatryhard.Models.Player", "player")
+                        .WithMany("PlayersMatchesAverages")
+                        .HasForeignKey("account_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("dotatryhard.Models.Match", null)
+                        .WithMany("PlayersMatchesAverages")
+                        .HasForeignKey("match_id");
+
+                    b.Navigation("player");
+                });
+
             modelBuilder.Entity("dotatryhard.Models.Match", b =>
                 {
                     b.Navigation("PlayersMatches");
+
+                    b.Navigation("PlayersMatchesAverages");
                 });
 
             modelBuilder.Entity("dotatryhard.Models.Player", b =>
                 {
                     b.Navigation("PlayersMatches");
+
+                    b.Navigation("PlayersMatchesAverages");
                 });
 #pragma warning restore 612, 618
         }

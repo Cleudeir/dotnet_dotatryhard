@@ -12,13 +12,14 @@ namespace dotatryhard.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-               ;
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Matches",
                 columns: table => new
                 {
-                    match_id = table.Column<long>(type: "bigint", nullable: false),
+                    match_id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     match_seq_num = table.Column<long>(type: "bigint", nullable: true),
                     start_time = table.Column<long>(type: "bigint", nullable: true),
                     cluster = table.Column<int>(type: "int", nullable: true),
@@ -31,26 +32,26 @@ namespace dotatryhard.Migrations
                 {
                     table.PrimaryKey("PK_Matches", x => x.match_id);
                 })
-               ;
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Players",
                 columns: table => new
                 {
                     account_id = table.Column<long>(type: "bigint", nullable: false)
-                     ,
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     personaname = table.Column<string>(type: "longtext", nullable: true)
-                        ,
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     avatarfull = table.Column<string>(type: "longtext", nullable: true)
-                       ,
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     loccountrycode = table.Column<string>(type: "longtext", nullable: true)
-
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Players", x => x.account_id);
                 })
-               ;
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "PlayersMatches",
@@ -91,12 +92,11 @@ namespace dotatryhard.Migrations
                     moonshard = table.Column<byte>(type: "tinyint unsigned", nullable: true),
                     hero_id = table.Column<short>(type: "smallint", nullable: true),
                     player_slot = table.Column<short>(type: "smallint", nullable: true),
-                    win = table.Column<byte>(type: "tinyint unsigned", nullable: false),
-                    score = table.Column<int>(type: "int", nullable: true)
+                    win = table.Column<byte>(type: "tinyint unsigned", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlayersMatches", x => new { x.account_id, x.match_id });
+                    table.PrimaryKey("PK_PlayersMatches", x => new { x.match_id, x.account_id });
                     table.ForeignKey(
                         name: "FK_PlayersMatches_Matches_match_id",
                         column: x => x.match_id,
@@ -110,11 +110,58 @@ namespace dotatryhard.Migrations
                         principalColumn: "account_id",
                         onDelete: ReferentialAction.Cascade);
                 })
-               ;
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PlayersMatchesAverages",
+                columns: table => new
+                {
+                    account_id = table.Column<long>(type: "bigint", nullable: false),
+                    match_count = table.Column<int>(type: "int", nullable: true),
+                    last_hits = table.Column<int>(type: "int", nullable: true),
+                    denies = table.Column<int>(type: "int", nullable: true),
+                    assists = table.Column<int>(type: "int", nullable: true),
+                    deaths = table.Column<int>(type: "int", nullable: true),
+                    kills = table.Column<int>(type: "int", nullable: true),
+                    hero_damage = table.Column<int>(type: "int", nullable: true),
+                    hero_healing = table.Column<int>(type: "int", nullable: true),
+                    net_worth = table.Column<int>(type: "int", nullable: true),
+                    tower_damage = table.Column<int>(type: "int", nullable: true),
+                    gold_per_min = table.Column<int>(type: "int", nullable: true),
+                    xp_per_min = table.Column<int>(type: "int", nullable: true),
+                    hero_level = table.Column<int>(type: "int", nullable: true),
+                    leaver_status = table.Column<int>(type: "int", nullable: true),
+                    aghanims_scepter = table.Column<int>(type: "int", nullable: true),
+                    aghanims_shard = table.Column<int>(type: "int", nullable: true),
+                    moonshard = table.Column<int>(type: "int", nullable: true),
+                    win = table.Column<int>(type: "int", nullable: true),
+                    match_id = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlayersMatchesAverages", x => x.account_id);
+                    table.ForeignKey(
+                        name: "FK_PlayersMatchesAverages_Matches_match_id",
+                        column: x => x.match_id,
+                        principalTable: "Matches",
+                        principalColumn: "match_id");
+                    table.ForeignKey(
+                        name: "FK_PlayersMatchesAverages_Players_account_id",
+                        column: x => x.account_id,
+                        principalTable: "Players",
+                        principalColumn: "account_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlayersMatches_match_id",
+                name: "IX_PlayersMatches_account_id",
                 table: "PlayersMatches",
+                column: "account_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlayersMatchesAverages_match_id",
+                table: "PlayersMatchesAverages",
                 column: "match_id");
         }
 
@@ -123,6 +170,9 @@ namespace dotatryhard.Migrations
         {
             migrationBuilder.DropTable(
                 name: "PlayersMatches");
+
+            migrationBuilder.DropTable(
+                name: "PlayersMatchesAverages");
 
             migrationBuilder.DropTable(
                 name: "Matches");

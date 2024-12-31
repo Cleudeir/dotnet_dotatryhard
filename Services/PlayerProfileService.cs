@@ -1,7 +1,8 @@
 using System.Text.Json;
-using dotatryhard.Models;
 using dotatryhard.Interfaces;
+using dotatryhard.Models;
 using dotatryhard.Utils;
+
 namespace dotatryhard.Services
 {
     public class PlayerProfileService : ISteamUserService
@@ -10,11 +11,14 @@ namespace dotatryhard.Services
         private readonly string? baseUrl = Environment.GetEnvironmentVariable("BASE_URL");
         private readonly string? apiKey = Environment.GetEnvironmentVariable("KEY_API");
 
-
-        public PlayerProfileService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public PlayerProfileService(
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration
+        )
         {
             _httpClientFactory = httpClientFactory;
         }
+
         public async Task<Player?> FetchProfilesAsync(long account_id)
         {
             var startTime = DateTime.Now;
@@ -28,16 +32,18 @@ namespace dotatryhard.Services
                     account_id = account_id,
                     personaname = "unknown",
                     avatarfull = null,
-                    loccountrycode = "unknown"
+                    loccountrycode = "unknown",
                 };
-                return  player;
+                return player;
             }
 
             try
             {
                 using var httpClient = _httpClientFactory.CreateClient();
 
-                var response = await httpClient.GetAsync($"{baseUrl}ISteamUser/GetPlayerSummaries/v0002/?key={apiKey}&steamids={steamId}");
+                var response = await httpClient.GetAsync(
+                    $"{baseUrl}ISteamUser/GetPlayerSummaries/v0002/?key={apiKey}&steamids={steamId}"
+                );
 
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
@@ -51,7 +57,7 @@ namespace dotatryhard.Services
                         account_id = account_id,
                         personaname = playerData?.personaname,
                         avatarfull = playerData?.avatarfull,
-                        loccountrycode = playerData?.loccountrycode
+                        loccountrycode = playerData?.loccountrycode,
                     };
                 }
                 else
@@ -61,16 +67,20 @@ namespace dotatryhard.Services
                         account_id = account_id,
                         personaname = "unknown",
                         avatarfull = null,
-                        loccountrycode = "unknown"
+                        loccountrycode = "unknown",
                     };
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching profile for accountId {account_id}: {ex.Message}");
+                Console.WriteLine(
+                    $"Error fetching profile for accountId {account_id}: {ex.Message}"
+                );
             }
 
-            Console.WriteLine($"Profile processing completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
+            Console.WriteLine(
+                $"Profile processing completed in {(DateTime.Now - startTime).TotalSeconds} seconds"
+            );
             return player;
         }
     }

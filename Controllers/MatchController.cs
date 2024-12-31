@@ -13,6 +13,7 @@ namespace dotatryhard.Controllers
         {
             _matchHistoryService = matchHistoryService;
         }
+
         // http://localhost:5034/api/MatchHistory/87683422
         [HttpGet("{accountId}")]
         public async Task<IActionResult> GetMatchHistory(int accountId)
@@ -28,7 +29,6 @@ namespace dotatryhard.Controllers
             {
                 Matches = result.Value.Matches, // List of match IDs
                 Players = result.Value.Players, // List of player IDs
-        
             };
             return Ok(response);
         }

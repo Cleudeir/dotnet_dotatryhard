@@ -7,6 +7,9 @@ namespace dotatryhard.Models
         public string? avatarfull { get; set; }
         public string? loccountrycode { get; set; }
 
-        public ICollection<PlayersMatches> PlayersMatches { get; set; } = new List<PlayersMatches>();
+        public ICollection<PlayersMatches> PlayersMatches { get; set; } =
+            new List<PlayersMatches>();
+        public ICollection<PlayersMatchesAverages> PlayersMatchesAverages { get; set; } =
+            new List<PlayersMatchesAverages>();
     }
 }

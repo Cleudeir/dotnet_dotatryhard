@@ -1,12 +1,20 @@
+using System.IO;
 using dotatryhard.Data;
 using dotatryhard.Interfaces;
 using dotatryhard.Services;
+using dotatryhard.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 // Load environment variables from .env
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure the configuration to not reload on change
+builder
+    .Configuration.SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false); // Disable file watcher
 
 // Configure logging to ignore database logs
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
@@ -28,29 +36,33 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     var connectionString = connectionStringTemplate
         .Replace("${MYSQL_HOST}", Environment.GetEnvironmentVariable("MYSQL_HOST") ?? "localhost")
         .Replace("${MYSQL_PORT}", Environment.GetEnvironmentVariable("MYSQL_PORT") ?? "3306")
-        .Replace("${MYSQL_DATABASE}", Environment.GetEnvironmentVariable("MYSQL_DATABASE") ?? "database")
+        .Replace(
+            "${MYSQL_DATABASE}",
+            Environment.GetEnvironmentVariable("MYSQL_DATABASE") ?? "database"
+        )
         .Replace("${MYSQL_USER}", Environment.GetEnvironmentVariable("MYSQL_USER") ?? "user")
-        .Replace("${MYSQL_PASSWORD}", Environment.GetEnvironmentVariable("MYSQL_PASSWORD") ?? "password");
+        .Replace(
+            "${MYSQL_PASSWORD}",
+            Environment.GetEnvironmentVariable("MYSQL_PASSWORD") ?? "password"
+        );
 
     // Configure MySQL provider
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 27)));
 });
 
 // Register the hosted service
-//builder.Services.AddHostedService<DataPopulationService>();
+builder.Services.AddHostedService<DataPopulationService>();
 
 // Register services for dependency injection
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 builder.Services.AddScoped<PlayersMatchesService>();
 builder.Services.AddScoped<ISteamUserService, PlayerProfileService>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-
     app.UseDeveloperExceptionPage(); // Enable detailed errors in development
     app.UseSwagger(); // Enable Swagger in development
     app.UseSwaggerUI(); // Enable Swagger UI for API exploration
