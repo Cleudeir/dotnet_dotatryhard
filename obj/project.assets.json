@@ -7416,19 +7416,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
-      "projectUniqueName": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
-      "projectName": "dotatryhard",
-      "projectPath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
-      "packagesPath": "/home/cleudeir/.nuget/packages/",
-      "outputPath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/obj/",
-=======
       "projectUniqueName": "/home/cleudeir/Pessoal/dotnet_dotatryhard/dotatryhard.csproj",
       "projectName": "dotatryhard",
       "projectPath": "/home/cleudeir/Pessoal/dotnet_dotatryhard/dotatryhard.csproj",
       "packagesPath": "/home/cleudeir/.nuget/packages/",
       "outputPath": "/home/cleudeir/Pessoal/dotnet_dotatryhard/obj/",
->>>>>>> 1683dce (Feat: average rating)
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/cleudeir/.nuget/NuGet/NuGet.Config"
@@ -7515,5 +7507,13 @@
         "runtimeIdentifierGraphPath": "/home/cleudeir/.asdf/installs/dotnet-core/8.0.403/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file /home/cleudeir/Pessoal/dotnet_dotatryhard/obj/project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

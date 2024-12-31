@@ -1,14 +1,8 @@
 {
   "version": 2,
-<<<<<<< HEAD
-  "dgSpecHash": "ky/z9eq41/E=",
-  "success": true,
-  "projectFilePath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
-=======
   "dgSpecHash": "AsYXKAACHI8=",
   "success": true,
   "projectFilePath": "/home/cleudeir/Pessoal/dotnet_dotatryhard/dotatryhard.csproj",
->>>>>>> 1683dce (Feat: average rating)
   "expectedPackageFiles": [
     "/home/cleudeir/.nuget/packages/dotnetenv/3.1.1/dotnetenv.3.1.1.nupkg.sha512",
     "/home/cleudeir/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
@@ -136,5 +130,12 @@
     "/home/cleudeir/.nuget/packages/system.xml.readerwriter/4.3.0/system.xml.readerwriter.4.3.0.nupkg.sha512",
     "/home/cleudeir/.nuget/packages/system.xml.xdocument/4.3.0/system.xml.xdocument.4.3.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file /home/cleudeir/Pessoal/dotnet_dotatryhard/obj/project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

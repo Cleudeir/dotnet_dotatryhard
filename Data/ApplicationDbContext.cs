@@ -9,6 +9,7 @@ namespace dotatryhard.Data
         public required DbSet<Match> Matches { get; set; }
         public required DbSet<Player> Players { get; set; }
         public required DbSet<PlayersMatches> PlayersMatches { get; set; }
+
         public required DbSet<PlayersMatchesAverages> PlayersMatchesAverages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

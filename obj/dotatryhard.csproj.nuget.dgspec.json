@@ -1,19 +1,6 @@
 {
   "format": 1,
   "restore": {
-<<<<<<< HEAD
-    "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj": {}
-  },
-  "projects": {
-    "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
-        "projectName": "dotatryhard",
-        "projectPath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/dotatryhard.csproj",
-        "packagesPath": "/home/cleudeir/.nuget/packages/",
-        "outputPath": "/home/cleudeir/Documents/_Pessoal/_repositories/cloned_repositories/dotnet_dotatryhard/obj/",
-=======
     "/home/cleudeir/Pessoal/dotnet_dotatryhard/dotatryhard.csproj": {}
   },
   "projects": {
@@ -25,7 +12,6 @@
         "projectPath": "/home/cleudeir/Pessoal/dotnet_dotatryhard/dotatryhard.csproj",
         "packagesPath": "/home/cleudeir/.nuget/packages/",
         "outputPath": "/home/cleudeir/Pessoal/dotnet_dotatryhard/obj/",
->>>>>>> 1683dce (Feat: average rating)
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/cleudeir/.nuget/NuGet/NuGet.Config"

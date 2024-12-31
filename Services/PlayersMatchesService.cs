@@ -329,7 +329,7 @@ namespace dotatryhard.Services
             };
 
             // Save result in cache
-            //_cache.Set(cacheKey, result);
+            _cache.Set(cacheKey, result);
             Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
             return result;
         }
