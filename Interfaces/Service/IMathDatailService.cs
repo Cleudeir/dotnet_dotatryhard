@@ -16,6 +16,13 @@ namespace dotatryhard.Interfaces
         public required List<PlayersMatchesAverages> playersMatchesAverages { get; set; }
     }
 
+    public class PlayerAveragesResponse
+    {
+        public string? personaname { get; set; }
+        public string? avatarfull { get; set; }
+        public string? loccountrycode { get; set; }
+    }
+
     public class AveragesResponse
     {
         public long account_id { get; set; }
@@ -36,8 +43,9 @@ namespace dotatryhard.Interfaces
         public int aghanims_scepter { get; set; }
         public int aghanims_shard { get; set; }
         public int moonshard { get; set; }
-        public int win_rate { get; set; }
-        public int score { get; set; }
+        public double win_rate { get; set; }
+        public long score { get; set; }
+        public PlayerAveragesResponse? player { get; set; }
     }
 
     public class AveragesAllResponse
@@ -55,7 +63,9 @@ namespace dotatryhard.Interfaces
         public double xp_per_min { get; set; }
         public double hero_level { get; set; }
         public double win_rate { get; set; }
-        public int score { get; set; }
+        public int wins { get; set; }
+        public int matches { get; set; }
+        public double score { get; set; }
     }
 
     public class AllWithAveragesResponse

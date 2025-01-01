@@ -7,23 +7,16 @@ namespace dotatryhard.Services
     public class DataPopulationService : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<DataPopulationService> _logger;
         private Task? _backgroundTask;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-        public DataPopulationService(
-            IServiceProvider serviceProvider,
-            ILogger<DataPopulationService> logger
-        )
+        public DataPopulationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("DataPopulationService is starting...");
-
             // Start the background task
             _backgroundTask = Task.Run(
                 () => RunBackgroundTask(_cancellationTokenSource.Token),
@@ -48,8 +41,6 @@ namespace dotatryhard.Services
 
                 if (processedAccounts.Contains(accountId))
                     continue;
-
-                _logger.LogInformation($"Processing account ID: {accountId}");
 
                 // Mark the account as processed
                 processedAccounts.Add(accountId);
@@ -80,6 +71,10 @@ namespace dotatryhard.Services
                             {
                                 accountQueue.Enqueue(player.account_id);
                             }
+                        }
+                        else
+                        {
+                            accountQueue.Enqueue(87683422);
                         }
                     }
 
@@ -170,7 +165,7 @@ namespace dotatryhard.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error processing account ID: {accountId}");
+                        Console.WriteLine($"{ex} - Error processing account ID: {accountId}");
                     }
                 }
 
@@ -181,7 +176,7 @@ namespace dotatryhard.Services
                 await Task.Delay(1000, cancellationToken);
             }
 
-            _logger.LogInformation("DataPopulationService background task completed.");
+            Console.WriteLine("DataPopulationService background task completed.");
         }
 
         private void SaveMatchToDatabase(ApplicationDbContext dbContext, Match match)
@@ -197,7 +192,9 @@ namespace dotatryhard.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error saving match details for match ID: {match.match_id}");
+                Console.WriteLine(
+                    $"{ex} - Error saving match details for match ID: {match.match_id}"
+                );
             }
         }
 
@@ -247,9 +244,8 @@ namespace dotatryhard.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    $"Error saving match details for match ID: {matchDetails?.Match?.match_id ?? -1}" // Handle null Match
+                Console.WriteLine(
+                    $"{ex} - Error saving match details for match ID: {matchDetails?.Match?.match_id ?? -1}" // Handle null Match
                 );
             }
         }
@@ -290,6 +286,10 @@ namespace dotatryhard.Services
                             (avg.tower_damage + existingAvg.tower_damage) / 2;
                         existingAvg.xp_per_min = (avg.xp_per_min + existingAvg.xp_per_min) / 2;
                         existingAvg.hero_level = (avg.hero_level + existingAvg.hero_level) / 2;
+                        existingAvg.score = (avg.score + existingAvg.score) / 2;
+
+                        existingAvg.cluster = matchDetails?.Match?.cluster;
+
                         existingAvg.win += avg.win;
                         existingAvg.aghanims_scepter += avg.aghanims_scepter;
                         existingAvg.aghanims_shard += avg.aghanims_shard;
@@ -304,9 +304,8 @@ namespace dotatryhard.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    $"Error saving match details for match ID: {matchDetails.Match.match_id}"
+                Console.WriteLine(
+                    $"{ex} - Error saving match details for match ID: {matchDetails.Match.match_id}"
                 );
             }
         }
@@ -318,23 +317,16 @@ namespace dotatryhard.Services
         {
             try
             {
-                if (dbContext.Players.Any(p => p.account_id == playerProfile.account_id))
-                {
-                    _logger.LogInformation($"Player: {playerProfile.account_id} exists");
-                }
-                else
+                if (!dbContext.Players.Any(p => p.account_id == playerProfile.account_id))
                 {
                     dbContext.Players.Add(playerProfile);
-                    _logger.LogInformation($"Added new Player: {playerProfile.account_id}");
+                    dbContext.SaveChanges();
                 }
-
-                dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    $"Error saving player profile with account ID: {playerProfile.account_id}"
+                Console.WriteLine(
+                    $" {ex} - Error saving player profile with account ID: {playerProfile.account_id}"
                 );
             }
         }
@@ -349,27 +341,24 @@ namespace dotatryhard.Services
                 if (dbContext.Players.Any(p => p.account_id == playerProfile.account_id))
                 {
                     dbContext.Players.Update(playerProfile);
-                    _logger.LogInformation($"Updated Player: {playerProfile.account_id}");
                 }
                 else
                 {
                     dbContext.Players.Add(playerProfile);
-                    _logger.LogInformation($"Added new Player: {playerProfile.account_id}");
                 }
                 dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    $"Error saving player profile with account ID: {playerProfile.account_id}"
+                Console.WriteLine(
+                    $"{ex} - Error saving player profile with account ID: {playerProfile.account_id}"
                 );
             }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("DataPopulationService is stopping.");
+            Console.WriteLine("DataPopulationService is stopping.");
 
             // Cancel the background task
             _cancellationTokenSource.Cancel();
@@ -382,7 +371,7 @@ namespace dotatryhard.Services
                 );
             }
 
-            _logger.LogInformation("DataPopulationService stopped.");
+            Console.WriteLine("DataPopulationService stopped.");
         }
     }
 }

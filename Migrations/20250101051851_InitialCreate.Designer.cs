@@ -12,7 +12,7 @@ using dotatryhard.Data;
 namespace dotatryhard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241231142906_InitialCreate")]
+    [Migration("20250101051851_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -250,6 +250,9 @@ namespace dotatryhard.Migrations
 
                     b.Property<int?>("net_worth")
                         .HasColumnType("int");
+
+                    b.Property<long>("score")
+                        .HasColumnType("bigint");
 
                     b.Property<int?>("tower_damage")
                         .HasColumnType("int");

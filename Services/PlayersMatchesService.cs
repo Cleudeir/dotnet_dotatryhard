@@ -10,10 +10,6 @@ namespace dotatryhard.Services
     public class PlayersMatchesService : IMatchDetailService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-
-        // Memory cache for   var cache = new Cache<string, string>();
-        private readonly Cache<string, AllWithAveragesResponse> _cache = new(100);
-
         private readonly ApplicationDbContext _dbContext;
 
         public PlayersMatchesService(
@@ -34,11 +30,9 @@ namespace dotatryhard.Services
             var playersMatchesAverages = new List<PlayersMatchesAverages>();
             try
             {
-                Console.WriteLine($"Processing matchDetails {match_seq_number}");
-
                 using var httpClient = _httpClientFactory.CreateClient();
                 var response = await httpClient.GetAsync(
-                    $"{Environment.GetEnvironmentVariable("BASE_URL")}/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1?matches_requested=1&start_at_match_seq_num={match_seq_number}&key={Environment.GetEnvironmentVariable("KEY_API")}"
+                    $"{Environment.GetEnvironmentVariable("BASE_URL")}/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1?matches_requested=1&start_at_match_seq_num={match_seq_number}&key={Environment.GetEnvironmentVariable("KEY_API2")}"
                 );
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
@@ -126,9 +120,59 @@ namespace dotatryhard.Services
                     );
                     players.Add(account_id);
                     // set average
+                    var weight = new
+                    {
+                        assists = 5,
+                        last_hits = 1,
+                        denies = -1,
+                        kills = 1,
+                        deaths = 1,
+                        gold_per_min = 1,
+                        hero_damage = 1,
+                        hero_healing = 0.1,
+                        net_worth = 1,
+                        tower_damage = 1,
+                        xp_per_min = 1,
+                        winRate = 5,
+                    };
+
+                    var totalWeight =
+                        weight.assists
+                        + weight.last_hits
+                        + weight.denies
+                        + weight.kills
+                        + weight.deaths
+                        + weight.gold_per_min
+                        + weight.hero_damage
+                        + weight.hero_healing
+                        + weight.net_worth
+                        + weight.tower_damage
+                        + weight.xp_per_min
+                        + weight.winRate;
+
+                    var score_avg =
+                        (
+                            player.assists * weight.assists
+                            + player.last_hits * weight.last_hits
+                            + player.denies * weight.denies
+                            + player.kills * weight.kills
+                            - player.deaths * weight.deaths
+                            + player.gold_per_min * weight.gold_per_min
+                            + player.hero_damage * weight.hero_damage
+                            + player.hero_healing * weight.hero_healing
+                            + player.net_worth * weight.net_worth
+                            + player.tower_damage * weight.tower_damage
+                            + player.xp_per_min * weight.xp_per_min
+                            + win * weight.winRate
+                        )
+                        / totalWeight
+                        / match.duration
+                        * 3000;
+
                     var playersMatchAverage = new PlayersMatchesAverages
                     {
                         account_id = account_id,
+                        cluster = match?.cluster ?? 0,
                         match_count = 1,
                         assists = player.assists,
                         deaths = player.deaths,
@@ -147,6 +191,7 @@ namespace dotatryhard.Services
                         hero_level = player.level,
                         leaver_status = player.leaver_status,
                         moonshard = player.moonshard,
+                        score = (long)score_avg,
                     };
                     playersMatchesAverages.Add(playersMatchAverage);
                 }
@@ -158,7 +203,9 @@ namespace dotatryhard.Services
                 );
             }
 
-            Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
+            Console.WriteLine(
+                $"GetMatchDetailsAsync: Completed in {(DateTime.Now - startTime).TotalSeconds} seconds"
+            );
             return new MatchDetailResponse
             {
                 Match = newMatch,
@@ -171,82 +218,24 @@ namespace dotatryhard.Services
         public async Task<AllWithAveragesResponse?> GetAllWithAveragesAsync()
         {
             var startTime = DateTime.Now;
-            const string cacheKey = "GetAllAverages";
-            // Check if the result is already in cache
-            var cachedResponse = _cache.Get(cacheKey);
-
-            if (cachedResponse != null)
-            {
-                Console.WriteLine(
-                    $"Cache hit for GetAllWithAverages {(DateTime.Now - startTime).TotalSeconds} seconds"
-                );
-                return cachedResponse;
-            }
-
-            List<PlayersMatchesAverages> listAverages = await _dbContext
+            var listAverages = await _dbContext
                 .Set<PlayersMatchesAverages>()
+                .Include(pma => pma.player)
+                .GroupBy(pma => pma.cluster)
                 .ToListAsync();
 
             if (listAverages == null || !listAverages.Any())
                 return null;
-
-            var weight = new
+            // region = RegionMapper.GetRegion(avg?.cluster ?? 0),
+            var PlayersMatchesAveragesList = listAverages.Select(group => new
             {
-                assists = 5,
-                last_hits = 1,
-                denies = -1,
-                kills = 1,
-                deaths = 1,
-                gold_per_min = 1,
-                hero_damage = 1,
-                hero_healing = 0.1,
-                net_worth = 1,
-                tower_damage = 1,
-                xp_per_min = 1,
-                winRate = 5,
-            };
-
-            var totalWeight =
-                weight.assists
-                + weight.last_hits
-                + weight.denies
-                + weight.kills
-                + weight.deaths
-                + weight.gold_per_min
-                + weight.hero_damage
-                + weight.hero_healing
-                + weight.net_worth
-                + weight.tower_damage
-                + weight.xp_per_min
-                + weight.winRate;
-
-            var PlayersMatchesAveragesList = listAverages
-                .Select(avg =>
-                {
-                    var score_avg = (int)(
-                        (
-                            (
-                                avg.assists * weight.assists
-                                + avg.last_hits * weight.last_hits
-                                + avg.denies * weight.denies
-                                + avg.kills * weight.kills
-                                - avg.deaths * weight.deaths
-                                + avg.gold_per_min * weight.gold_per_min
-                                + avg.hero_damage * weight.hero_damage
-                                + avg.hero_healing * weight.hero_healing
-                                + avg.net_worth * weight.net_worth
-                                + avg.tower_damage * weight.tower_damage
-                                + avg.xp_per_min * weight.xp_per_min
-                                + avg.win * weight.winRate
-                            ) / totalWeight
-                        ) ?? 0
-                    );
-
-                    var newAvg = new AveragesResponse
+                Cluster = group.Key,
+                Players = group
+                    .OrderByDescending(avg => avg.score)
+                    .Select(avg => new AveragesResponse
                     {
-                        score = score_avg,
+                        score = avg.score,
                         account_id = avg.account_id,
-                        matches = avg.match_count ?? 0,
                         assists = avg.assists ?? 0,
                         deaths = avg.deaths ?? 0,
                         denies = avg.denies ?? 0,
@@ -258,21 +247,24 @@ namespace dotatryhard.Services
                         net_worth = avg.net_worth ?? 0,
                         tower_damage = avg.tower_damage ?? 0,
                         xp_per_min = avg.xp_per_min ?? 0,
-                        win_rate = avg.win / avg.match_count * 100 ?? 0,
                         aghanims_scepter = avg.aghanims_scepter / avg.match_count * 100 ?? 0,
                         aghanims_shard = avg.aghanims_shard / avg.match_count * 100 ?? 0,
                         hero_level = avg.hero_level ?? 0,
                         leaver_status = avg.leaver_status / avg.match_count * 100 ?? 0,
                         moonshard = avg.moonshard / avg.match_count * 100 ?? 0,
-                    };
-                    return newAvg;
-                })
-                .ToList();
+                        matches = avg.match_count ?? 0,
+                        win_rate = (double?)avg.win / avg.match_count * 100 ?? 0,
+                        player = new PlayerAveragesResponse
+                        {
+                            avatarfull = avg?.player?.avatarfull,
+                            personaname = avg?.player?.personaname,
+                            loccountrycode = avg?.player?.loccountrycode,
+                        },
+                    }),
+            });
 
             //PlayersMatchesAveragesList order list to score
-            var PlayersMatchesAveragesOrder = PlayersMatchesAveragesList
-                .OrderByDescending(avg => avg.score)
-                .ToList();
+            var PlayersMatchesAveragesOrder = PlayersMatchesAveragesList.Take(2000).ToList();
 
             var kills = listAverages.Average(pm => pm.kills ?? 0);
             var deaths = listAverages.Average(pm => pm.deaths ?? 0);
@@ -286,24 +278,11 @@ namespace dotatryhard.Services
             var goldPerMin = listAverages.Average(pm => pm.gold_per_min ?? 0);
             var xpPerMin = listAverages.Average(pm => pm.xp_per_min ?? 0);
             var heroLevel = listAverages.Average(pm => pm.hero_level ?? 0);
-            var winRate = listAverages.Count(pm => pm.win == 1) / (double)listAverages.Count * 100;
-
-            var score = (int)(
-                (
-                    assists * weight.assists
-                    + lastHits * weight.last_hits
-                    + denies * weight.denies
-                    + kills * weight.kills
-                    - deaths * weight.deaths
-                    + goldPerMin * weight.gold_per_min
-                    + heroDamage * weight.hero_damage
-                    + heroHealing * weight.hero_healing
-                    + netWorth * weight.net_worth
-                    + towerDamage * weight.tower_damage
-                    + xpPerMin * weight.xp_per_min
-                    + winRate * weight.winRate
-                ) / totalWeight
-            );
+            var wins = listAverages.Sum(pm => pm.win) ?? 0;
+            var matches = listAverages.Sum(pm => pm.match_count) ?? 1;
+            var winRate = (double)wins / matches * 100;
+            Console.WriteLine($"winRate: {wins} / {matches} = {winRate}");
+            var score = listAverages.Average(pm => pm.score);
 
             var averages = new AveragesAllResponse
             {
@@ -320,6 +299,8 @@ namespace dotatryhard.Services
                 xp_per_min = xpPerMin,
                 hero_level = heroLevel,
                 win_rate = winRate,
+                wins = wins,
+                matches = matches,
                 score = score,
             };
 
@@ -329,9 +310,9 @@ namespace dotatryhard.Services
                 Averages = averages,
             };
 
-            // Save result in cache
-            _cache.Set(cacheKey, result);
-            Console.WriteLine($"Completed in {(DateTime.Now - startTime).TotalSeconds} seconds");
+            Console.WriteLine(
+                $"GetAllWithAveragesAsync: Completed in {(DateTime.Now - startTime).TotalSeconds} seconds"
+            );
             return result;
         }
     }

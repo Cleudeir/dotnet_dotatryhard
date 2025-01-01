@@ -2,6 +2,7 @@ namespace dotatryhard.Models
 {
     public class PlayersMatchesAverages
     {
+        public int? cluster { get; set; }
         public long account_id { get; set; }
         public int? match_count { get; set; }
         public int? last_hits { get; set; }
@@ -21,6 +22,7 @@ namespace dotatryhard.Models
         public int? aghanims_shard { get; set; }
         public int? moonshard { get; set; }
         public int? win { get; set; }
+        public long score { get; set; }
         public Player? player { get; set; }
     }
 }

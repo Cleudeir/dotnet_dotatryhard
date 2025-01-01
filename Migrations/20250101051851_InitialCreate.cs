@@ -135,6 +135,7 @@ namespace dotatryhard.Migrations
                     aghanims_shard = table.Column<int>(type: "int", nullable: true),
                     moonshard = table.Column<int>(type: "int", nullable: true),
                     win = table.Column<int>(type: "int", nullable: true),
+                    score = table.Column<long>(type: "bigint", nullable: false),
                     match_id = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
