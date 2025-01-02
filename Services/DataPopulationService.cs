@@ -61,21 +61,25 @@ namespace dotatryhard.Services
                     {
                         var AllPlayersMatchesAverages =
                             await matchDetailService.GetAllWithAveragesAsync();
-                        if (AllPlayersMatchesAverages != null)
-                        {
-                            // accountQueue.Enqueue(player);
-                            var PlayersMatches = AllPlayersMatchesAverages.PlayersMatches;
-                            // first 2000 players
-                            var PlayersMatchesLimited = PlayersMatches.Take(2000).ToList();
-                            foreach (var player in PlayersMatchesLimited)
-                            {
-                                accountQueue.Enqueue(player.account_id);
-                            }
-                        }
-                        else
-                        {
-                            accountQueue.Enqueue(87683422);
-                        }
+                        // if (AllPlayersMatchesAverages != null)
+                        // {
+                        //     // accountQueue.Enqueue(player);
+                        //     var PlayersMatches = AllPlayersMatchesAverages.playersMatches.Select(
+                        //         group =>
+                        //         {
+                        //             group.
+                        //             foreach (var player in group.)
+                        //             {
+                        //                 accountQueue.Enqueue(player.account_id);
+                        //             }
+                        //         }
+                        //     );
+                        //     // first 2000 players
+                        // }
+                        // else
+                        // {
+                        //     accountQueue.Enqueue(87683422);
+                        // }
                     }
 
                     try
@@ -288,7 +292,9 @@ namespace dotatryhard.Services
                         existingAvg.hero_level = (avg.hero_level + existingAvg.hero_level) / 2;
                         existingAvg.score = (avg.score + existingAvg.score) / 2;
 
-                        existingAvg.cluster = matchDetails?.Match?.cluster;
+                        existingAvg.region = RegionMapper.GetRegion(
+                            matchDetails?.Match?.cluster ?? 0
+                        );
 
                         existingAvg.win += avg.win;
                         existingAvg.aghanims_scepter += avg.aghanims_scepter;

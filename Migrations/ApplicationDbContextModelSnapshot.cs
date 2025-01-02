@@ -248,6 +248,10 @@ namespace dotatryhard.Migrations
                     b.Property<int?>("net_worth")
                         .HasColumnType("int");
 
+                    b.Property<string>("region")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<long>("score")
                         .HasColumnType("bigint");
 

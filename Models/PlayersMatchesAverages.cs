@@ -2,7 +2,7 @@ namespace dotatryhard.Models
 {
     public class PlayersMatchesAverages
     {
-        public int? cluster { get; set; }
+        public required string region { get; set; }
         public long account_id { get; set; }
         public int? match_count { get; set; }
         public int? last_hits { get; set; }

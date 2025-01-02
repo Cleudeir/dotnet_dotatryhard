@@ -117,6 +117,8 @@ namespace dotatryhard.Migrations
                 columns: table => new
                 {
                     account_id = table.Column<long>(type: "bigint", nullable: false),
+                    region = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     match_count = table.Column<int>(type: "int", nullable: true),
                     last_hits = table.Column<int>(type: "int", nullable: true),
                     denies = table.Column<int>(type: "int", nullable: true),

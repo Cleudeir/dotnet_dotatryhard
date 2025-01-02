@@ -26,6 +26,7 @@ namespace dotatryhard.Interfaces
     public class AveragesResponse
     {
         public long account_id { get; set; }
+        public int position { get; set; }
         public int matches { get; set; }
         public int last_hits { get; set; }
         public int denies { get; set; }
@@ -70,7 +71,19 @@ namespace dotatryhard.Interfaces
 
     public class AllWithAveragesResponse
     {
-        public required List<AveragesResponse> PlayersMatches { get; set; }
-        public required AveragesAllResponse Averages { get; set; }
+        public required List<ClusterPlayersResponse> playersMatches { get; set; }
+        public required List<ClusterAveragesResponse> averages { get; set; }
+    }
+
+    public class ClusterPlayersResponse
+    {
+        public string? region { get; set; }
+        public required IEnumerable<AveragesResponse> data { get; set; }
+    }
+
+    public class ClusterAveragesResponse
+    {
+        public string? region { get; set; }
+        public required AveragesAllResponse data { get; set; }
     }
 }
