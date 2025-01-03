@@ -61,25 +61,21 @@ namespace dotatryhard.Services
                     {
                         var AllPlayersMatchesAverages =
                             await matchDetailService.GetAllWithAveragesAsync();
-                        // if (AllPlayersMatchesAverages != null)
-                        // {
-                        //     // accountQueue.Enqueue(player);
-                        //     var PlayersMatches = AllPlayersMatchesAverages.playersMatches.Select(
-                        //         group =>
-                        //         {
-                        //             group.
-                        //             foreach (var player in group.)
-                        //             {
-                        //                 accountQueue.Enqueue(player.account_id);
-                        //             }
-                        //         }
-                        //     );
-                        //     // first 2000 players
-                        // }
-                        // else
-                        // {
-                        //     accountQueue.Enqueue(87683422);
-                        // }
+
+                        if (AllPlayersMatchesAverages?.playersMatches != null)
+                        {
+                            foreach (var group in AllPlayersMatchesAverages.playersMatches)
+                            {
+                                foreach (var avg in group.data)
+                                {
+                                    accountQueue.Enqueue(avg.account_id);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            accountQueue.Enqueue(87683422);
+                        }
                     }
 
                     try
