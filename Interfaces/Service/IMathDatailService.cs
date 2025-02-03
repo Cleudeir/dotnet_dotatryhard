@@ -86,4 +86,9 @@ namespace dotatryhard.Interfaces
         public string? region { get; set; }
         public required AveragesAllResponse data { get; set; }
     }
+
+    public class AllMatchesPlayerResponse
+    {
+        public required List<PlayersMatches> playersMatches { get; set; }
+    }
 }
